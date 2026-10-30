@@ -25,6 +25,8 @@
   #veil .t{font-size:22px;letter-spacing:2px}
   #veil .s{font-size:13px;color:var(--dim);letter-spacing:1px}
   #veil.gone{opacity:0;pointer-events:none}
+  #veil.tap{cursor:pointer}
+  #veil.tap .s{animation:blink 2.4s infinite;font-size:14px}
 
   .hud{position:fixed;left:0;right:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:9px;
     padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));z-index:3}
@@ -137,7 +139,7 @@
 </div>
 <button class="btn corner exit ride-only" id="exitBtn">🌍 지구 보기</button>
 <button class="btn corner view ride-only" id="viewBtn">🎥 앞에서 보기</button>
-<button class="btn corner music" id="musicBtn" title="음악">♪</button>
+<button class="btn corner music on" id="musicBtn" title="음악 켜기/끄기">♪</button>
 
 <div class="feed" id="feed"></div>
 <div id="toast"></div>
@@ -192,7 +194,10 @@ function tex(u,srgb=true){return loader.load(u,t=>{if(--toLoad===0)ready();},und
 const T={day:tex('earth-day.jpg'),night:tex('earth-night.jpg'),spec:tex('earth-spec.jpg',false),clouds:tex('earth-clouds.jpg',false),moon:tex('moon.jpg')};
 [T.day,T.night,T.moon].forEach(t=>t.encoding=THREE.sRGBEncoding);
 Object.values(T).forEach(t=>t.anisotropy=renderer.capabilities.getMaxAnisotropy());
-function ready(){setTimeout(()=>$('veil').classList.add('gone'),300);}
+let readyDone=false;
+function ready(){if(readyDone)return;readyDone=true;const v=$('veil');v.querySelector('.s').innerHTML='화면을 눌러 밤하늘로 들어가요 <span style="color:var(--gold)">♪</span>';v.classList.add('tap');
+  const go=()=>{v.classList.add('gone');try{audioInit();AC.resume&&AC.resume();if(musicWanted&&!musicOn){musicOn=true;$('musicBtn').classList.add('on');playSong();}}catch(e){}};
+  v.addEventListener('pointerdown',go,{once:true});addEventListener('keydown',function k(){if(!v.classList.contains('gone'))go();removeEventListener('keydown',k);});}
 setTimeout(ready,9000);
 
 // faint borders texture
@@ -403,7 +408,7 @@ function dropAt(local,byMe=true,startOv=null,size=null,dur=1.1){
 }
 
 // ---------- audio: music box (Silent Night, public domain) + sleigh bells ----------
-let AC=null,master=null,musicOn=false,musicTimer=null,rev=null;
+let musicWanted=true;let AC=null,master=null,musicOn=false,musicTimer=null,rev=null;
 function audioInit(){if(AC)return;AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.5;
   rev=AC.createConvolver();const len=AC.sampleRate*2.6,ir=AC.createBuffer(2,len,AC.sampleRate);
   for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);}rev.buffer=ir;
@@ -434,7 +439,7 @@ function playSong(){if(!musicOn)return;const song=SONGS[songIdx%SONGS.length];so
     t+=d*beat;b+=d;});
   musicTimer=setTimeout(playSong,(t-AC.currentTime+3.2)*1000);}
 function bells(){if(!AC)return;const t=AC.currentTime;for(let i=0;i<7;i++){const tt=t+i*.045+Math.random()*.02;[2637,3520,4186,3136].forEach(f=>tone(f*rand(.98,1.02),tt,.35,.018));}}
-$('musicBtn').onclick=()=>{audioInit();AC.resume&&AC.resume();musicOn=!musicOn;$('musicBtn').classList.toggle('on',musicOn);clearTimeout(musicTimer);if(musicOn)playSong();else{master.gain.cancelScheduledValues(AC.currentTime);master.gain.setValueAtTime(master.gain.value,AC.currentTime);master.gain.linearRampToValueAtTime(0,AC.currentTime+.4);setTimeout(()=>{if(!musicOn){master.disconnect();master=AC.createGain();master.gain.value=.5;master.connect(AC.destination);master.connect(rev);}},500);}};
+$('musicBtn').onclick=()=>{audioInit();AC.resume&&AC.resume();musicOn=!musicOn;musicWanted=musicOn;$('musicBtn').classList.toggle('on',musicOn);clearTimeout(musicTimer);if(musicOn)playSong();else{master.gain.cancelScheduledValues(AC.currentTime);master.gain.setValueAtTime(master.gain.value,AC.currentTime);master.gain.linearRampToValueAtTime(0,AC.currentTime+.4);setTimeout(()=>{if(!musicOn){master.disconnect();master=AC.createGain();master.gain.value=.5;master.connect(AC.destination);master.connect(rev);}},500);}};
 
 // ---------- orbit interaction ----------
 let dragging=false,moved=0,last=null,vel={x:0,y:0},idle=0;const pointers=new Map();let pinch0=null;
