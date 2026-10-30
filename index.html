@@ -65,7 +65,7 @@
   #whisper{position:fixed;left:0;right:0;top:calc(max(16px,env(safe-area-inset-top)) + 44px);text-align:center;font-size:11.5px;color:var(--dim);
     letter-spacing:.5px;opacity:0;transition:opacity 1.2s;pointer-events:none;z-index:3;text-shadow:0 1px 8px rgba(0,0,0,.9)}
   #whisper.show{opacity:1}
-  body:not(.ride) #whisper{top:auto;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 6px)}
+  body:not(.ride) #whisper{top:auto;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 84px)}
 
   .feed{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:calc(max(18px,env(safe-area-inset-bottom)) + 236px);z-index:2;
     pointer-events:none;display:flex;flex-direction:column;gap:4px;font-size:11.5px;max-width:62vw}
@@ -108,6 +108,13 @@
   .corner{position:fixed;top:max(16px,env(safe-area-inset-top));font-size:13px;padding:8px 13px;z-index:5;color:var(--dim)}
   .exit{left:max(12px,env(safe-area-inset-left))}
   .icon{width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .zin{display:none!important}
+  body.flying:not(.ride) #exitBtn{display:flex!important}
+  body.flying:not(.ride) #exitBtn .zin{display:block!important}
+  body.flying:not(.ride) #exitBtn .zout{display:none!important}
+  body.flying #rideBtn,body.flying #newRide,body.flying #hint{display:none!important}
+  body.flying:not(.ride) .rankb{top:calc(max(16px,env(safe-area-inset-top)) + 50px)}
+  #rankBottom,#rankSide,#newRide{display:none!important}
   .home{left:max(12px,env(safe-area-inset-left));top:calc(max(16px,env(safe-area-inset-top)) + 50px)}
   #mini{position:fixed;right:max(12px,env(safe-area-inset-right));top:calc(max(16px,env(safe-area-inset-top)) + 50px);width:92px;height:92px;z-index:4;pointer-events:none;
     border-radius:50%;box-shadow:0 0 0 1px rgba(251,243,228,.18),0 0 24px rgba(120,170,255,.25)}
@@ -199,7 +206,7 @@
   </div>
   <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물 · 화면 클릭(H) 버튼 숨기기</div>
 </div>
-<button class="btn corner exit ride-only icon" id="exitBtn" title="지구 보기" aria-label="지구 보기"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.6 2.8 2.6 14.2 0 17"/><path d="M12 3.5c-2.6 2.8-2.6 14.2 0 17"/></svg></button>
+<button class="btn corner exit ride-only icon" id="exitBtn" title="지구 보기" aria-label="지구 보기"><svg class="zin" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/><path d="M10.5 8v5M8 10.5h5"/></svg><svg class="zout" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.6 2.8 2.6 14.2 0 17"/><path d="M12 3.5c-2.6 2.8-2.6 14.2 0 17"/></svg></button>
 <button class="btn corner home ride-only icon" id="homeBtn" title="북극 산타 마을로" aria-label="북극 산타 마을로"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 12 4.5l8.5 7"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
 <div id="rankSheet" role="dialog" aria-modal="true"><div class="sheet"><div class="sh-h"><span>선물을 많이 받은 나라</span><button class="sh-x" id="rankClose" aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
 <ol id="rankList"></ol><div class="sh-kr" id="rankKr"></div><div class="sh-sub" id="rankSub"></div></div></div>
@@ -755,7 +762,7 @@ function enterRide(fresh,slot){
   if(!fresh&&RIDE.saved){const S=RIDE.saved;RIDE.p.copy(S.p);RIDE.f.copy(S.f);RIDE.fc.copy(S.f);RIDE.t=30;RIDE.hS=RIDE.h;RIDE.hNow=RIDE.h;RIDE.turn=0;RIDE.steer=0;vel={x:0,y:0};
     sleigh.visible=true;trail.visible=true;trLife.fill(0);sleighPose();globe.updateMatrixWorld();
     trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:3,to:'ride'};mode='toRide';document.body.classList.add('ride');
-    const [lo,la]=v2ll(RIDE.p);const c=countryAt(lo,la);toast('다시 출발해요',(c?c.n:'바다')+' 상공에서 이어서 날아요');return;}
+    return;}
   spawnVillage(slot);vel={x:0,y:0};
   globe.updateMatrixWorld();
   trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:3.2,to:'ride'};
@@ -766,11 +773,11 @@ let meMark=null;
 function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();const g1=glow(0xffd48a,.045,.95);const g2=glow(0xff5a4a,.016,1);meMark.add(g1,g2);
   const lb=textSprite('🛷 내 썰매');lb.scale.set(.12,.03,1);lb.position.y=.035;meMark.add(lb);meMark.userData.g=g1;globe.add(meMark);}
   meMark.position.copy(RIDE.saved.p.clone().multiplyScalar(R+.012));meMark.visible=true;}
-function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};$('rideBtn').textContent='🛷 날던 곳에서 이어서 날기';$('newRide').style.display='';setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
+function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};RIDE.flying=true;document.body.classList.add('flying');setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
   mode='toOrbit';document.body.classList.remove('ride');}
 $('viewBtn').onclick=()=>setView(view+1);$('rankBtn').onclick=()=>{renderRank();$('rankSheet').classList.add('on');};$('rankClose').onclick=()=>$('rankSheet').classList.remove('on');$('rankSheet').addEventListener('pointerdown',e=>{if(e.target.id==='rankSheet')$('rankSheet').classList.remove('on');});$('homeBtn').onclick=()=>{if(mode==='ride')$('ask').classList.add('on');};$('askNo').onclick=()=>$('ask').classList.remove('on');$('askYes').onclick=()=>{$('ask').classList.remove('on');backToVillage();};$('ask').addEventListener('pointerdown',e=>{if(e.target.id==='ask')$('ask').classList.remove('on');});
 const SPOTS=['큰 트리 앞','선물 포장 공장','순록 마구간','산타 할아버지 집','요정들의 작업실','얼음 호수','쿠키 굽는 집','북극 우체국'];
-$('rideBtn').onclick=()=>{audioInit();enterRide(!RIDE.saved);};$('newRide').onclick=()=>{audioInit();enterRide(true);};$('exitBtn').onclick=exitRide;
+$('rideBtn').onclick=()=>{audioInit();enterRide(!RIDE.saved);};$('newRide').onclick=()=>{audioInit();enterRide(true);};$('exitBtn').onclick=()=>{if(mode==='ride')exitRide();else if(mode==='orbit'&&RIDE.flying){RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};RIDE.flying=false;document.body.classList.remove('flying');enterRide(false);}};
 function rideDrop(){if(mode!=='ride')return;setFace('surprised',1.3);
   const start=RIDE.p.clone().multiplyScalar(R+RIDE.hNow+.002).add(RIDE.fc.clone().multiplyScalar(.004));
   const ground=RIDE.p.clone().add(RIDE.f.clone().multiplyScalar(.012)).normalize();
@@ -853,7 +860,8 @@ function rideStep(dt){
 }
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function updateCamera(dt){
-  if(mode!=='orbit'&&mode!=='toOrbit')rideStep(dt);
+  if((mode!=='orbit'&&mode!=='toOrbit')||RIDE.flying)rideStep(dt);
+  if(RIDE.flying&&meMark){meMark.position.copy(RIDE.p).multiplyScalar(R+.012);meMark.visible=mode==='orbit';}
   let pose;
   if(mode==='orbit'){pose=orbitCamPose();camera.position.lerp(pose.pos,.12);camTarget.copy(pose.tgt);camera.up.copy(pose.up);}
   else if(mode==='ride'){pose=rideCamPose();camera.position.copy(pose.pos);camTarget.copy(pose.tgt);camera.up.copy(pose.up);}
@@ -893,7 +901,7 @@ const MP={
     if(sb)sb.from('gifts').insert({lon:g.lon,lat:g.lat,country:key,santa:nick}).then(({error})=>{if(error)console.warn(error.message)});
     if(online){totalGifts++;if(key!=='바다'&&key!=='산타 마을')counts.set(key,(counts.get(key)||0)+1);statPts.push([g.lon,g.lat]);setBots(statPts);renderRank();}},
   pushPresence(force){if(!chanReady)return;const now=performance.now();if(!force&&now-lastPos<250)return;lastPos=now;
-    const ride=mode==='ride'||mode==='toRide';
+    const ride=mode==='ride'||mode==='toRide'||RIDE.flying;
     const st={id:myId,n:nick,m:ride?'r':'o'};
     if(ride){st.p=RIDE.p.toArray().map(v=>+v.toFixed(5));st.f=RIDE.f.toArray().map(v=>+v.toFixed(4));st.h=+RIDE.hNow.toFixed(4);}
     chan.send({type:'broadcast',event:'pos',payload:st}).catch(()=>{});}
@@ -945,7 +953,9 @@ function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);c
 addEventListener('resize',resize);resize();
 const clock=new THREE.Clock();const tq=new THREE.Quaternion(),UP=new THREE.Vector3(0,1,0);
 function loop(){const dt=Math.min(clock.getDelta(),.05);idle+=dt;starMat.uniforms.time.value+=dt;
-  if(mode==='orbit'&&!dragging){if(Math.abs(vel.x)+Math.abs(vel.y)>1e-4){rotateBy(vel.x,vel.y);vel.x*=.94;vel.y*=.94;}else if(idle>3){rotateBy(.0005,0);}}
+  if(mode==='orbit'&&RIDE.flying&&!dragging&&idle>2.5&&Math.abs(vel.x)+Math.abs(vel.y)<1e-4){const [lo,la]=v2ll(RIDE.p);const h=ll2v(lo,0).normalize();
+    const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),la*DEG*.85).multiply(new THREE.Quaternion().setFromUnitVectors(h,new THREE.Vector3(0,0,1)));globe.quaternion.slerp(q,Math.min(1,dt*.6));}
+  else if(mode==='orbit'&&!dragging){if(Math.abs(vel.x)+Math.abs(vel.y)>1e-4){rotateBy(vel.x,vel.y);vel.x*=.94;vel.y*=.94;}else if(idle>3){rotateBy(.0005,0);}}
   clouds.rotation.y+=dt*.0035;SUN.copy(SUN_LOCAL).applyQuaternion(globe.quaternion);sunL.position.copy(SUN).multiplyScalar(10);
   updateCamera(dt);faceTick();updDrop();
   const vt=village.userData.tree;vt.userData.star.rotation.y+=dt*.6;{const te=clock.elapsedTime;vt.userData.lights.forEach(L=>{L.g.material.opacity=.45+.55*Math.max(0,Math.sin(te*L.sp+L.ph));});vt.userData.halo.material.opacity=.45+.15*Math.sin(te*1.7);}village.userData.vg.material.opacity=(.4+.15*Math.sin(clock.elapsedTime*1.3))*(1-closeK*.9);
