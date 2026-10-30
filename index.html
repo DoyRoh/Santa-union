@@ -317,7 +317,62 @@ const starMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blendi
  for(let i=0;i<70;i++){const a=i/70*6.283+rand(-.04,.04);const v=b1.clone().multiplyScalar(Math.cos(a)).add(b2.clone().multiplyScalar(Math.sin(a))).add(band.clone().multiplyScalar(rand(-.05,.05))).normalize().multiplyScalar(78);
    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:hzT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false,opacity:rand(.5,1),color:new THREE.Color().setHSL(rand(.58,.68),.4,.7)}));
    s.position.copy(v);s.scale.setScalar(rand(14,24));scene.add(s);}
+ // ---- richer Milky Way: bright core, warm glow, dark dust lane ----
+ const blob=(r,g,b,a)=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const q=x.createRadialGradient(64,64,0,64,64,64);
+   q.addColorStop(0,`rgba(${r},${g},${b},${a})`);q.addColorStop(.5,`rgba(${r},${g},${b},${a*.35})`);q.addColorStop(1,`rgba(${r},${g},${b},0)`);x.fillStyle=q;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);};
+ const warmT=blob(255,214,170,.32),blueT=blob(150,180,255,.24),dustT=blob(0,0,0,.55);
+ const coreA=rand(0,6.283);
+ for(let i=0;i<260;i++){const a=i/260*6.283;const near=Math.exp(-Math.pow(((a-coreA+9.42)%6.283)-3.14,2)/0.9);
+   const v=b1.clone().multiplyScalar(Math.cos(a)).add(b2.clone().multiplyScalar(Math.sin(a))).add(band.clone().multiplyScalar(rand(-.07,.07)*(1+near))).normalize().multiplyScalar(77);
+   const warm=Math.random()<.35+near*.5;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:warm?warmT:blueT,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false,opacity:.35+.65*Math.random()*(.4+near)}));
+   s.position.copy(v);s.scale.setScalar(rand(8,16)*(1+near*1.3));scene.add(s);}
+ for(let i=0;i<90;i++){const a=coreA+rand(-1.3,1.3);const v=b1.clone().multiplyScalar(Math.cos(a)).add(b2.clone().multiplyScalar(Math.sin(a))).add(band.clone().multiplyScalar(rand(-.02,.025))).normalize().multiplyScalar(76);
+   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:dustT,transparent:true,depthWrite:false,fog:false,opacity:rand(.25,.55)}));s.position.copy(v);s.scale.set(rand(5,9),rand(2,4),1);s.material.rotation=rand(0,6.28);scene.add(s);}
+ // ---- a few distant spiral galaxies ----
+ function galaxyTex(hue){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.translate(128,128);
+   const core=x.createRadialGradient(0,0,0,0,0,40);core.addColorStop(0,'rgba(255,240,215,.95)');core.addColorStop(1,'rgba(255,220,180,0)');x.fillStyle=core;x.beginPath();x.arc(0,0,40,0,7);x.fill();
+   for(let arm=0;arm<2;arm++)for(let i=0;i<1400;i++){const k=Math.random();const th=k*9+arm*Math.PI+rand(-.35,.35);const r=6+k*110;
+     const px=Math.cos(th)*r+rand(-6,6)*k*2,py=Math.sin(th)*r+rand(-6,6)*k*2;const al=(1-k)*.35;x.fillStyle=`hsla(${hue+rand(-20,20)},70%,${75+rand(-10,15)}%,${al})`;x.fillRect(px,py,1.6,1.6);}
+   const t=new THREE.CanvasTexture(c);return t;}
+ [[.0,215,7,.5],[2.1,280,4,.7],[4.0,30,3.2,-.4]].forEach(([a,hue,sz,rot])=>{const d=b1.clone().multiplyScalar(Math.cos(a+1.2)).add(b2.clone().multiplyScalar(Math.sin(a+1.2))).add(band.clone().multiplyScalar(rand(.5,.9)*(Math.random()<.5?-1:1))).normalize().multiplyScalar(74);
+   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:galaxyTex(hue),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false,opacity:.85,rotation:rot}));s.position.copy(d);s.scale.set(sz,sz*.45,1);scene.add(s);});
 }
+// ---- aurora: curtains around the magnetic poles, only on the night side ----
+const AURORA=[];
+function makeAurora(plon,plat,rad){const pole=ll2v(plon,plat).normalize();let ax=new THREE.Vector3(0,1,0).cross(pole);if(ax.lengthSq()<1e-6)ax.set(1,0,0);ax.normalize();
+  const e1=new THREE.Vector3().crossVectors(pole,ax).normalize(),e2=ax;const N=260;const pos=[],uv=[],idx=[];
+  for(let i=0;i<=N;i++){const a=i/N*Math.PI*2;const rr=(rad+Math.sin(a*3)*2.2+Math.sin(a*7+1)*1.1)*DEG;
+    const d=pole.clone().multiplyScalar(Math.cos(rr)).add(e1.clone().multiplyScalar(Math.sin(rr)*Math.cos(a))).add(e2.clone().multiplyScalar(Math.sin(rr)*Math.sin(a))).normalize();
+    const lo=d.clone().multiplyScalar(R*1.004),hi=d.clone().multiplyScalar(R*1.05);pos.push(lo.x,lo.y,lo.z,hi.x,hi.y,hi.z);uv.push(i/N,0,i/N,1);
+    if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);
+  const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{time:{value:0},sunDir:{value:SUN}},
+    vertexShader:`varying vec2 vUv;varying vec3 vW;void main(){vUv=uv;vW=normalize(mat3(modelMatrix)*position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`uniform float time;uniform vec3 sunDir;varying vec2 vUv;varying vec3 vW;
+      float h(float x){return fract(sin(x*127.1)*43758.5);}float n(float x){float i=floor(x),f=fract(x);return mix(h(i),h(i+1.),f*f*(3.-2.*f));}
+      void main(){float x=vUv.x*90.;float rays=n(x*3.+time*.6)*.6+n(x*11.-time*1.3)*.4;float band=n(x*.35+time*.12);
+        float y=vUv.y;float prof=smoothstep(0.,.12,y)*pow(1.-y,1.6);
+        vec3 col=mix(vec3(.15,1.,.55),vec3(.55,.3,1.),smoothstep(.35,1.,y));
+        float night=smoothstep(.05,-.25,dot(vW,sunDir));
+        float a=prof*(.25+.75*rays)*(.35+.65*band)*night*1.5;gl_FragColor=vec4(col*a,a);}`});
+  const mesh=new THREE.Mesh(g,m);mesh.renderOrder=3;globe.add(mesh);AURORA.push(m);}
+// ---- shooting stars ----
+const METEORS=[];let meteorT=rand(3,6);
+function spawnMeteor(){const fwd=new THREE.Vector3();camera.getWorldDirection(fwd);
+  const side=new THREE.Vector3().crossVectors(fwd,camera.up).normalize(),up=camera.up.clone().normalize();
+  const dir=fwd.clone().add(side.clone().multiplyScalar(rand(-.55,.55))).add(up.clone().multiplyScalar(rand(.05,.5))).normalize();
+  const start=camera.position.clone().add(dir.multiplyScalar(60));
+  const vel=side.clone().multiplyScalar(rand(.6,1)*(Math.random()<.5?-1:1)).add(up.clone().multiplyScalar(-rand(.3,.7))).normalize().multiplyScalar(rand(26,40));
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+  g.setAttribute('color',new THREE.BufferAttribute(new Float32Array([1,.97,.9,0,0,0]),3));
+  const line=new THREE.Line(g,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  const head=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color:0xfff3d6,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));head.scale.setScalar(.9);
+  scene.add(line,head);METEORS.push({line,head,p:start,vel,t:0,life:rand(.7,1.2),len:rand(5,9)});}
+function meteorTick(dt){meteorT-=dt;if(meteorT<=0){spawnMeteor();meteorT=Math.random()<.2?rand(.4,1.2):rand(4,11);}
+  for(let i=METEORS.length-1;i>=0;i--){const m=METEORS[i];m.t+=dt;m.p.addScaledVector(m.vel,dt);const k=m.t/m.life;const fade=Math.sin(Math.min(1,k)*Math.PI);
+    const tail=m.p.clone().addScaledVector(m.vel.clone().normalize(),-m.len*fade);const a=m.line.geometry.attributes.position.array;a.set([m.p.x,m.p.y,m.p.z,tail.x,tail.y,tail.z]);m.line.geometry.attributes.position.needsUpdate=true;
+    m.line.material.opacity=fade;m.head.position.copy(m.p);m.head.material.opacity=fade;
+    if(k>=1){scene.remove(m.line,m.head);m.line.geometry.dispose();METEORS.splice(i,1);}}}
 // moon
 const moon=new THREE.Mesh(new THREE.SphereGeometry(.9,48,32),new THREE.MeshStandardMaterial({map:T.moon,roughness:1,metalness:0,fog:false}));
 moon.position.set(-26,9,-34);scene.add(moon);
@@ -378,6 +433,7 @@ const glowT=(()=>{const c=document.createElement('canvas');c.width=c.height=64;c
   gr.addColorStop(0,'rgba(255,245,215,1)');gr.addColorStop(.25,'rgba(255,205,120,.7)');gr.addColorStop(1,'rgba(255,190,90,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);})();
 const glow=(color,scale,op=1)=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:op}));s.scale.setScalar(scale);return s;};
 
+makeAurora(-72.7,80.7,21);makeAurora(107.3,-80.7,21);
 // ---------- materials ----------
 const STD=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.6,metalness:0,...o});
 const GOLD=STD(0xe9b85a,{metalness:.75,roughness:.28,emissive:0x3a2208});
@@ -959,7 +1015,7 @@ function resize(){const w=canvas.clientWidth||innerWidth,h=Math.max(canvas.clien
   if(!resize.done){camDist=w<h?3.4:4.1;camera.position.z=camDist;resize.done=1;}camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 const clock=new THREE.Clock();const tq=new THREE.Quaternion(),UP=new THREE.Vector3(0,1,0);
-function loop(){const dt=Math.min(clock.getDelta(),.05);idle+=dt;starMat.uniforms.time.value+=dt;
+function loop(){const dt=Math.min(clock.getDelta(),.05);meteorTick(dt);for(const m of AURORA)m.uniforms.time.value+=dt;idle+=dt;starMat.uniforms.time.value+=dt;
   if(mode==='orbit'&&RIDE.flying&&!dragging&&idle>2.5&&Math.abs(vel.x)+Math.abs(vel.y)<1e-4){const [lo,la]=v2ll(RIDE.p);const h=ll2v(lo,0).normalize();
     const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),la*DEG*.85).multiply(new THREE.Quaternion().setFromUnitVectors(h,new THREE.Vector3(0,0,1)));globe.quaternion.slerp(q,Math.min(1,dt*.6));}
   else if(mode==='orbit'&&!dragging){if(Math.abs(vel.x)+Math.abs(vel.y)>1e-4){rotateBy(vel.x,vel.y);vel.x*=.94;vel.y*=.94;}else if(idle>3){rotateBy(.0005,0);}}
