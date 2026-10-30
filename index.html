@@ -298,11 +298,14 @@ const STD=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.6,metalne
 const GOLD=STD(0xe9b85a,{metalness:.75,roughness:.28,emissive:0x3a2208});
 const boxG=new THREE.BoxGeometry(1,1,1);
 
+const PLAZA={c:new THREE.Vector3(),e1:new THREE.Vector3(),e2:new THREE.Vector3()};
 // ---------- Santa's village at the North Pole ----------
 const village=new THREE.Group();village.position.set(0,R,0);globe.add(village);
 {const u=.0042;
  const snowM=STD(0xf4f8ff,{roughness:.95}),woodM=STD(0x7a4b2e,{roughness:.8}),redM=STD(0xb8342c),greenM=STD(0x2d6a45,{roughness:.8}),winM=new THREE.MeshBasicMaterial({color:0xffc66b});
- function house(x,z,rot,w,col){const h=new THREE.Group();h.position.set(x*u,0,z*u);h.rotation.y=rot;village.add(h);
+ const YUP=new THREE.Vector3(0,1,0);
+ function ground(o,px,pz,rot){const y=Math.sqrt(R*R-px*px-pz*pz)-R;o.position.set(px,y,pz);o.quaternion.setFromUnitVectors(YUP,new THREE.Vector3(px,R+y,pz).normalize());o.rotateY(rot);}
+ function house(x,z,rot,w,col,sc=1){const h=new THREE.Group();ground(h,x*u,z*u,rot);h.scale.setScalar(sc);village.add(h);
    const b=new THREE.Mesh(boxG,col);b.scale.set(w*u,1.3*u,1.6*u);b.position.y=.65*u;h.add(b);
    const roof=new THREE.Mesh(new THREE.ConeGeometry(1.25*u*w/1.6*1.0+.4*u,1.0*u,4),snowM);roof.rotation.y=Math.PI/4;roof.scale.set(1,1,1.25);roof.position.y=1.8*u;h.add(roof);
    const ch=new THREE.Mesh(boxG,woodM);ch.scale.set(.25*u,.7*u,.25*u);ch.position.set(.35*w*u,1.9*u,.2*u);h.add(ch);
@@ -315,7 +318,16 @@ const village=new THREE.Group();village.position.set(0,R,0);globe.add(village);
  // big tree
  const tree=new THREE.Group();village.add(tree);
  {const pole=new THREE.Vector3(0,1,0);const tk=ll2v(127.8,80).normalize().sub(pole).normalize();const sd=new THREE.Vector3().crossVectors(tk,pole).normalize();
-  const tp=sd.multiplyScalar(-.042).add(tk.multiplyScalar(.1));tree.position.set(tp.x,-.0006,tp.z);tree.scale.setScalar(4.2);}
+  const tp=sd.clone().multiplyScalar(-.042).add(tk.clone().multiplyScalar(.1));ground(tree,tp.x,tp.z,0);tree.position.y-=.0006;tree.scale.setScalar(4.2);
+  PLAZA.c.set(tp.x,R,tp.z).normalize();PLAZA.e1.copy(tk);PLAZA.e2.copy(sd);
+  // a ring of cottages around the big tree
+  const cols=[redM,woodM,STD(0x8c3b33),STD(0x5b3a28),STD(0x9c4a3a),STD(0x6e4a34)];
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2+.11;const r=.098+(i%2)*.012;const hx=tp.x+(Math.cos(a)*tk.x+Math.sin(a)*sd.x)*r,hz=tp.z+(Math.cos(a)*tk.z+Math.sin(a)*sd.z)*r;
+    const dir=Math.atan2(tp.x-hx,tp.z-hz);house(hx/u,hz/u,dir,rand(1.6,2.4),cols[i%cols.length],1.7);}
+  // lantern posts lining the plaza
+  for(let i=0;i<24;i++){const a=i/24*Math.PI*2;const r=.078;const lx=tp.x+(Math.cos(a)*tk.x+Math.sin(a)*sd.x)*r,lz=tp.z+(Math.cos(a)*tk.z+Math.sin(a)*sd.z)*r;
+    const lp=new THREE.Group();ground(lp,lx,lz,0);village.add(lp);const post=new THREE.Mesh(new THREE.CylinderGeometry(.06*u,.08*u,1.6*u,6),STD(0x2b2b33));post.position.y=.8*u;lp.add(post);
+    const g=glow(0xffc27a,1.1*u,.95);g.position.y=1.7*u;lp.add(g);}}
  [[2.2,2.4,1.6],[1.7,2.0,3.0],[1.2,1.6,4.2],[.75,1.2,5.2]].forEach(([r,h,y])=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r*u,h*u,12),greenM);c.position.y=y*u;tree.add(c);
    const sc=new THREE.Mesh(new THREE.ConeGeometry(r*u*.9,h*u*.25,12),snowM);sc.position.y=(y+h*.38)*u;tree.add(sc);});
  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.3*u,.35*u,1.2*u,8),woodM);trunk.position.y=.6*u;tree.add(trunk);
@@ -584,14 +596,16 @@ function enterRide(fresh){
   // start at the North Pole village, facing Korea
   const pole=new THREE.Vector3(0,1,0);const toK=ll2v(127.8,80).normalize().sub(pole).normalize();
   const side=new THREE.Vector3().crossVectors(toK,pole).normalize();
-  RIDE.p.copy(pole).add(toK.clone().multiplyScalar(-.05)).normalize();
-  RIDE.f.copy(toK).sub(RIDE.p.clone().multiplyScalar(toK.dot(RIDE.p))).normalize();RIDE.fc.copy(RIDE.f);
+  {const a=Math.floor(Math.random()*16)/16*Math.PI*2;const off=PLAZA.e1.clone().multiplyScalar(Math.cos(a)).add(PLAZA.e2.clone().multiplyScalar(Math.sin(a)));
+   RIDE.p.copy(PLAZA.c).add(off.multiplyScalar(.056)).normalize();
+   const inward=PLAZA.c.clone().sub(RIDE.p);inward.sub(RIDE.p.clone().multiplyScalar(inward.dot(RIDE.p))).normalize();
+   RIDE.f.crossVectors(inward,RIDE.p).normalize();RIDE.fc.copy(RIDE.f);setLvl(0);}
   RIDE.hNow=.0045;RIDE.hS=RIDE.h;RIDE.t=0;RIDE.turn=0;RIDE.steer=0;vel={x:0,y:0};
   sleigh.visible=true;trail.visible=true;trLife.fill(0);sleighPose();
   globe.updateMatrixWorld();
   trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:3.2,to:'ride'};
   mode='toRide';document.body.classList.add('ride');
-  toast('북극, 산타 마을','루돌프의 코에 불이 켜졌어요. 곧 출발해요');
+  toast('북극 산타 마을에 도착','친구들을 기다리다가, 속도를 올리면 출발해요');
 }
 let meMark=null;
 function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();const g1=glow(0xffd48a,.045,.95);const g2=glow(0xff5a4a,.016,1);meMark.add(g1,g2);
@@ -620,7 +634,7 @@ function rideUp(){if(rd&&rd.m<8&&mode==='ride')rideDrop();rd=null;RIDE.drag=0;}
 
 let overT=0;
 function rideStep(dt){
-  RIDE.t+=dt;if(viewT<1)viewT=Math.min(1,viewT+dt/1.6);
+  if(RIDE.lvl>0||RIDE.t>7.6)RIDE.t+=dt;if(viewT<1)viewT=Math.min(1,viewT+dt/1.6);
   // takeoff: wait, then climb gently
   RIDE.hS+=(RIDE.h-RIDE.hS)*Math.min(1,dt*.6);const lift=smooth(1.6,7.5,RIDE.t);const prevH=RIDE.hNow;RIDE.hNow=THREE.MathUtils.lerp(.0045,RIDE.hS,lift);
   RIDE.climb=THREE.MathUtils.clamp((RIDE.hNow-prevH)/Math.max(dt,1e-4)*-6,-.35,.3);
