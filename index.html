@@ -87,6 +87,11 @@
   .steer{width:52px;height:52px;border-radius:50%;padding:0 0 3px;font-size:30px;line-height:1;display:flex;align-items:center;justify-content:center;color:var(--dim);background:rgba(8,13,30,.32)}
   .drop{width:68px;height:68px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center}
   .drop span{font-size:28px}
+  .drop b{display:none;font-family:'Gowun Batang',serif;font-size:17px;letter-spacing:1px}
+  .drop.go{width:120px;border-radius:999px;gap:6px}
+  .drop.go span{font-size:20px}
+  .drop.go b{display:inline}
+  .drop{transition:width .35s,border-radius .35s}
   .tune{pointer-events:auto;align-items:center;gap:7px;background:rgba(8,13,30,.38);border:1px solid var(--line);border-radius:999px;padding:4px 8px 4px 13px;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:11.5px;color:var(--faint)}
   .tune .tl{letter-spacing:.5px}
@@ -101,20 +106,6 @@
   .home{left:max(12px,env(safe-area-inset-left));top:calc(max(16px,env(safe-area-inset-top)) + 50px)}
   #mini{position:fixed;right:max(12px,env(safe-area-inset-right));top:calc(max(16px,env(safe-area-inset-top)) + 50px);width:92px;height:92px;z-index:4;pointer-events:none;
     border-radius:50%;box-shadow:0 0 0 1px rgba(251,243,228,.18),0 0 24px rgba(120,170,255,.25)}
-  #wheel{position:fixed;inset:0;z-index:17;display:none;align-items:center;justify-content:center;background:rgba(4,7,15,.55)}
-  #wheel.on{display:flex}
-  #wheel .wbox{background:rgba(10,14,30,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(243,199,112,.28);border-radius:24px;
-    padding:20px 20px 16px;width:min(330px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.55)}
-  #wheel .wt{font-family:'Gowun Batang',serif;font-size:18px;font-weight:700}
-  #wheel .wsub{font-size:11.5px;color:var(--faint);margin-top:3px;letter-spacing:1px}
-  #wheel .wwrap{position:relative;width:min(260px,72vw);aspect-ratio:1;margin:14px auto 6px}
-  #wheel canvas{width:100%;height:100%;display:block}
-  #wheel .wptr{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;
-    border-top:20px solid var(--gold);filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
-  #wheel .wres{font-family:'Gowun Batang',serif;font-size:15px;min-height:22px;color:var(--gold);margin-top:4px}
-  #wheel .row{display:flex;gap:10px;justify-content:center;margin-top:12px}
-  #wheel .btn{font-size:14px;padding:9px 18px}
-  #wheel .btn[disabled]{opacity:.45}
   .hud,.corner,#mini,.feed,.side-rank,#whisper{transition:opacity .6s}
   body.zen .hud,body.zen .corner,body.zen #mini,body.zen .feed,body.zen .side-rank{opacity:0!important;pointer-events:none!important}
   body.zen .hud *{pointer-events:none!important}
@@ -181,17 +172,13 @@
   </div>
   <div class="controls ride-only">
     <button class="btn steer" id="left" aria-label="왼쪽">‹</button>
-    <button class="btn warm drop" id="dropBtn" aria-label="선물 내려보내기"><span>🎁</span></button>
+    <button class="btn warm drop" id="dropBtn" aria-label="선물 내려보내기"><span id="dropIc">🎁</span><b id="dropTx">출발</b></button>
     <button class="btn steer" id="right" aria-label="오른쪽">›</button>
   </div>
   <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물 · 화면 클릭(H) 버튼 숨기기</div>
 </div>
 <button class="btn corner exit ride-only icon" id="exitBtn" title="지구 보기">🌍</button>
 <button class="btn corner home ride-only icon" id="homeBtn" title="북극 산타 마을로" aria-label="북극 산타 마을로"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
-<div id="wheel" role="dialog" aria-modal="true"><div class="wbox"><div class="wt">어디서 출발할까요?</div><div class="wsub">북극 산타 마을 출발 룰렛</div>
-<div class="wwrap"><canvas id="wcv" width="560" height="560"></canvas><div class="wptr"></div></div>
-<div class="wres" id="wres">&nbsp;</div>
-<div class="row"><button class="btn" id="wSpin">다시 돌리기</button><button class="btn warm" id="wGo" disabled>출발!</button></div></div></div>
 <div id="ask" role="dialog" aria-modal="true"><div class="box"><div class="q">북극 산타 마을로 돌아갈까요?</div><div class="d">지금 날고 있는 곳을 떠나 마을 광장으로 가요</div><div class="row"><button class="btn" id="askNo">계속 날기</button><button class="btn warm" id="askYes">돌아가기</button></div></div></div>
 <canvas id="mini" class="ride-only" width="200" height="200"></canvas>
 <div id="fade"></div>
@@ -733,7 +720,7 @@ function spawnVillage(slot){
   sleigh.visible=true;trail.visible=true;trLife.fill(0);sleighPose();}
 function backToVillage(slot){if(mode!=='ride')return;const f=$('fade');f.classList.add('on');
   setTimeout(()=>{spawnVillage(slot);RIDE.hS=RIDE.h;viewT=1;globe.updateMatrixWorld();const pose=rideCamPose();camera.position.copy(pose.pos);camTarget.copy(pose.tgt);
-    f.classList.remove('on');toast(SPOTS[slot]+'(으)로 돌아왔어요','속도를 올리면 다시 출발해요');},700);}
+    f.classList.remove('on');toast('북극 산타 마을로 돌아왔어요','‹ › 로 방향을 정하고 출발을 눌러요');},700);}
 function enterRide(fresh,slot){
   if(mode!=='orbit')return;document.body.classList.remove('fresh');if(meMark)meMark.visible=false;
   if(!fresh&&RIDE.saved){const S=RIDE.saved;RIDE.p.copy(S.p);RIDE.f.copy(S.f);RIDE.fc.copy(S.f);RIDE.t=30;RIDE.hS=RIDE.h;RIDE.hNow=RIDE.h;RIDE.turn=0;RIDE.steer=0;vel={x:0,y:0};
@@ -744,7 +731,7 @@ function enterRide(fresh,slot){
   globe.updateMatrixWorld();
   trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:3.2,to:'ride'};
   mode='toRide';document.body.classList.add('ride');
-  toast((slot!=null?SPOTS[slot]:'북극 산타 마을')+'에서 출발 준비','친구들을 기다리다가, 속도를 올리면 출발해요');
+  toast('북극 산타 마을','‹ › 로 방향을 정하고 출발을 눌러요');
 }
 let meMark=null;
 function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();const g1=glow(0xffd48a,.045,.95);const g2=glow(0xff5a4a,.016,1);meMark.add(g1,g2);
@@ -752,46 +739,24 @@ function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();co
   meMark.position.copy(RIDE.saved.p.clone().multiplyScalar(R+.012));meMark.visible=true;}
 function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};$('rideBtn').textContent='🛷 날던 곳에서 이어서 날기';$('newRide').style.display='';setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
   mode='toOrbit';document.body.classList.remove('ride');}
-$('viewBtn').onclick=()=>setView(view+1);$('homeBtn').onclick=()=>{if(mode==='ride')$('ask').classList.add('on');};$('askNo').onclick=()=>$('ask').classList.remove('on');$('askYes').onclick=()=>{$('ask').classList.remove('on');openWheel(s=>backToVillage(s));};$('ask').addEventListener('pointerdown',e=>{if(e.target.id==='ask')$('ask').classList.remove('on');});
+$('viewBtn').onclick=()=>setView(view+1);$('homeBtn').onclick=()=>{if(mode==='ride')$('ask').classList.add('on');};$('askNo').onclick=()=>$('ask').classList.remove('on');$('askYes').onclick=()=>{$('ask').classList.remove('on');backToVillage();};$('ask').addEventListener('pointerdown',e=>{if(e.target.id==='ask')$('ask').classList.remove('on');});
 const SPOTS=['큰 트리 앞','선물 포장 공장','순록 마구간','산타 할아버지 집','요정들의 작업실','얼음 호수','쿠키 굽는 집','북극 우체국'];
-const WCOL=['#b8322b','#f3ead6','#2f6e4f','#f3ead6','#b8322b','#f3ead6','#2f6e4f','#f3ead6'];
-const wcv=$('wcv'),wg=wcv.getContext('2d');let wRot=0,wSpin=null,wSlot=null,wCb=null,wLastSeg=-1;
-function drawWheel(){const W=wcv.width,c=W/2,r=c-8,n=SPOTS.length,seg=Math.PI*2/n;wg.clearRect(0,0,W,W);
-  wg.save();wg.translate(c,c);wg.rotate(wRot);
-  for(let i=0;i<n;i++){wg.beginPath();wg.moveTo(0,0);wg.arc(0,0,r,-Math.PI/2+i*seg,-Math.PI/2+(i+1)*seg);wg.closePath();wg.fillStyle=WCOL[i];wg.fill();
-    wg.save();wg.rotate(-Math.PI/2+(i+.5)*seg);wg.translate(r*.6,0);wg.rotate(Math.PI/2);wg.fillStyle=WCOL[i]==='#f3ead6'?'#5a2a22':'#fbf3e4';
-    wg.font='bold 25px "Gowun Dodum",sans-serif';wg.textAlign='center';wg.textBaseline='middle';
-    const words=SPOTS[i].split(' ');if(words.length>1){wg.fillText(words.slice(0,-1).join(' '),0,-15);wg.fillText(words[words.length-1],0,15);}else wg.fillText(SPOTS[i],0,0);wg.restore();}
-  wg.restore();
-  wg.lineWidth=10;wg.strokeStyle='#e9b85a';wg.beginPath();wg.arc(c,c,r,0,7);wg.stroke();
-  for(let i=0;i<24;i++){const a=i/24*Math.PI*2;wg.fillStyle=i%2?'#fff3c4':'#ffcf6a';wg.beginPath();wg.arc(c+Math.cos(a)*r,c+Math.sin(a)*r,4.5,0,7);wg.fill();}
-  wg.fillStyle='#e9b85a';wg.beginPath();wg.arc(c,c,30,0,7);wg.fill();wg.font='30px serif';wg.textAlign='center';wg.textBaseline='middle';wg.fillText('🎅',c,c+2);}
-function spin(){if(wSpin)return;wSlot=null;$('wGo').disabled=true;$('wSpin').disabled=true;$('wres').innerHTML='&nbsp;';
-  const n=SPOTS.length,target=Math.floor(Math.random()*n);const seg=Math.PI*2/n;
-  const want=-(target+.3+Math.random()*.4)*seg;let end=want;while(end<wRot+Math.PI*2*5)end+=Math.PI*2;
-  wSpin={from:wRot,to:end,t:0,dur:3.6,target};}
-function wheelTick(dt){if(!wSpin)return;wSpin.t+=dt/wSpin.dur;const k=Math.min(1,wSpin.t);const e=1-Math.pow(1-k,3.2);wRot=wSpin.from+(wSpin.to-wSpin.from)*e;
-  const n=SPOTS.length,seg=Math.PI*2/n;const cur=Math.floor((((-wRot)%(Math.PI*2))+Math.PI*2)%(Math.PI*2)/seg);
-  if(cur!==wLastSeg){wLastSeg=cur;if(AC)tone(2600+Math.random()*300,AC.currentTime,.06,.03);}
-  drawWheel();
-  if(k>=1){wSlot=wSpin.target;wSpin=null;$('wres').textContent='🎯 '+SPOTS[wSlot]+'에서 출발해요';$('wGo').disabled=false;$('wSpin').disabled=false;bells();}}
-function openWheel(cb){wCb=cb;$('wheel').classList.add('on');drawWheel();setTimeout(spin,250);}
-$('wSpin').onclick=spin;$('wGo').onclick=()=>{if(wSlot==null)return;$('wheel').classList.remove('on');const cb=wCb;wCb=null;cb&&cb(wSlot);};
-$('wheel').addEventListener('pointerdown',e=>{if(e.target.id==='wheel'&&!wSpin){$('wheel').classList.remove('on');wCb=null;}});
-drawWheel();
-$('rideBtn').onclick=()=>{audioInit();if(RIDE.saved)enterRide(false);else openWheel(s=>enterRide(true,s));};$('newRide').onclick=()=>{audioInit();openWheel(s=>enterRide(true,s));};$('exitBtn').onclick=exitRide;
+$('rideBtn').onclick=()=>{audioInit();enterRide(!RIDE.saved);};$('newRide').onclick=()=>{audioInit();enterRide(true);};$('exitBtn').onclick=exitRide;
 function rideDrop(){if(mode!=='ride')return;setFace('surprised',1.3);
   const start=RIDE.p.clone().multiplyScalar(R+RIDE.hNow+.002).add(RIDE.fc.clone().multiplyScalar(.004));
   const ground=RIDE.p.clone().add(RIDE.f.clone().multiplyScalar(.012)).normalize();
   dropAt(ground,true,start,.003,2.2);}
-$('dropBtn').addEventListener('pointerdown',e=>{e.preventDefault();rideDrop();});
+const grounded=()=>(mode==='ride'||mode==='toRide')&&RIDE.t===0;
+function takeOff(){if(!grounded())return;setLvl(Math.max(2,RIDE.lvl));whisper('출발! 루돌프가 달리기 시작해요');}
+let dropState=null;function updDrop(){const g=grounded();if(g===dropState)return;dropState=g;const b=$('dropBtn');b.classList.toggle('go',g);$('dropIc').textContent=g?'🛷':'🎁';b.setAttribute('aria-label',g?'출발':'선물 내려보내기');}
+$('dropBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(grounded())takeOff();else rideDrop();});
 const hold=(id,k)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();RIDE[k]=1;try{b.setPointerCapture(e.pointerId)}catch(_){}});['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>RIDE[k]=0));};
 hold('left','btnL');hold('right','btnR');
 addEventListener('keydown',e=>{if(mode==='orbit'&&e.key==='h'&&!e.repeat)toggleZen();});
 addEventListener('keydown',e=>{if(mode!=='ride')return;
   if(e.key==='ArrowLeft'||e.key==='a')RIDE.keyL=1;if(e.key==='ArrowRight'||e.key==='d')RIDE.keyR=1;
   if(e.key==='ArrowUp'&&!e.repeat)setLvl(RIDE.lvl+1);if(e.key==='ArrowDown'&&!e.repeat)setLvl(RIDE.lvl-1);if((e.key==='w'||e.key==='PageUp')&&!e.repeat)setAlt(RIDE.alt+1);if((e.key==='s'||e.key==='PageDown')&&!e.repeat)setAlt(RIDE.alt-1);
-  if((e.key==='v'||e.key==='c')&&!e.repeat)setView(view+1);if(e.key==='h'&&!e.repeat)toggleZen();if(e.code==='Space'){e.preventDefault();if(!e.repeat)rideDrop();}if(e.key==='Escape')exitRide();});
+  if((e.key==='v'||e.key==='c')&&!e.repeat)setView(view+1);if(e.key==='h'&&!e.repeat)toggleZen();if(e.code==='Space'){e.preventDefault();if(!e.repeat){if(grounded())takeOff();else rideDrop();}}if(e.key==='Escape')exitRide();});
 addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')RIDE.keyL=0;if(e.key==='ArrowRight'||e.key==='d')RIDE.keyR=0;});
 let rd=null;
 function rideDown(e){rd={x:e.clientX,y:e.clientY,m:0};}
@@ -854,7 +819,7 @@ function rideStep(dt){
   trGeo.attributes.position.needsUpdate=true;trGeo.attributes.color.needsUpdate=true;
   miniT-=dt;if(miniT<=0&&(mode==='ride'||mode==='toRide')){miniT=.25;drawMini();}
   overT-=dt;if(overT<=0){overT=.35;const [lon,lat]=v2ll(RIDE.p);const c=countryAt(lon,lat);
-    $('over').textContent=lat>84?'북극 산타 마을':c?c.n:(lat>66?'북극해':'바다');}
+    $('over').textContent=(lat>84||RIDE.p.distanceTo(PLAZA.c)<.14)?'북극 산타 마을':c?c.n:(lat>66?'북극해':'바다');}
 }
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function updateCamera(dt){
@@ -952,7 +917,7 @@ const clock=new THREE.Clock();const tq=new THREE.Quaternion(),UP=new THREE.Vecto
 function loop(){const dt=Math.min(clock.getDelta(),.05);idle+=dt;starMat.uniforms.time.value+=dt;
   if(mode==='orbit'&&!dragging){if(Math.abs(vel.x)+Math.abs(vel.y)>1e-4){rotateBy(vel.x,vel.y);vel.x*=.94;vel.y*=.94;}else if(idle>3){rotateBy(.0005,0);}}
   clouds.rotation.y+=dt*.0035;SUN.copy(SUN_LOCAL).applyQuaternion(globe.quaternion);sunL.position.copy(SUN).multiplyScalar(10);
-  updateCamera(dt);wheelTick(dt);faceTick();
+  updateCamera(dt);faceTick();updDrop();
   const vt=village.userData.tree;vt.userData.star.rotation.y+=dt*.6;{const te=clock.elapsedTime;vt.userData.lights.forEach(L=>{L.g.material.opacity=.45+.55*Math.max(0,Math.sin(te*L.sp+L.ph));});vt.userData.halo.material.opacity=.45+.15*Math.sin(te*1.7);}village.userData.vg.material.opacity=(.4+.15*Math.sin(clock.elapsedTime*1.3))*(1-closeK*.9);
   for(let i=anims.length-1;i>=0;i--){const a=anims[i];a.t+=dt/a.dur;const t=Math.min(a.t,1);const e=1-Math.pow(1-t,1.6)*(1-t*0)*1;const ee=t<1?(t*t*(3-2*t)):1;
     a.g.position.lerpVectors(a.start,a.end,ee);a.g.position.add(a.end.clone().normalize().multiplyScalar(Math.sin(t*Math.PI)*a.start.distanceTo(a.end)*.08));
