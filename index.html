@@ -86,7 +86,12 @@
   .controls{gap:26px;align-items:center;justify-content:center;margin-top:2px}
   .steer{width:52px;height:52px;border-radius:50%;padding:0 0 3px;font-size:30px;line-height:1;display:flex;align-items:center;justify-content:center;color:var(--dim);background:rgba(8,13,30,.32)}
   .drop{width:68px;height:68px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center}
-  .drop span{font-size:28px}
+  .drop span{font-size:28px;display:flex;color:#fff8ec}
+  .icon svg,.music svg{display:block}
+  body .rankb{left:max(12px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top))}
+  body.ride .rankb{top:calc(max(16px,env(safe-area-inset-top)) + 150px)}
+  body.fresh .rankb{display:none!important}
+  .steer svg{color:var(--ink)}
   .drop b{display:none;font-family:'Gowun Batang',serif;font-size:17px;letter-spacing:1px}
   .drop.go{width:120px;border-radius:999px;gap:6px}
   .drop.go span{font-size:20px}
@@ -110,6 +115,23 @@
   body.zen .hud,body.zen .corner,body.zen #mini,body.zen .feed,body.zen .side-rank{opacity:0!important;pointer-events:none!important}
   body.zen .hud *{pointer-events:none!important}
   body.fresh #hint,body.fresh .rank,body.fresh .me{display:none!important}
+  #rankSheet{position:fixed;inset:0;z-index:16;display:none;align-items:flex-end;justify-content:center;background:rgba(4,7,15,.4)}
+  #rankSheet.on{display:flex}
+  #rankSheet .sheet{width:min(420px,100vw);background:rgba(10,14,30,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-bottom:0;
+    border-radius:22px 22px 0 0;padding:16px 20px calc(18px + env(safe-area-inset-bottom));animation:up .35s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  #rankSheet .sh-h{display:flex;justify-content:space-between;align-items:center;font-family:'Gowun Batang',serif;font-size:16px;font-weight:700;margin-bottom:10px}
+  #rankSheet .sh-x{background:none;border:0;color:var(--dim);padding:6px;cursor:pointer}
+  #rankSheet ol{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+  #rankSheet li{display:grid;grid-template-columns:22px 1fr 54px;align-items:center;gap:8px;font-size:13.5px}
+  #rankSheet li .n{color:var(--faint);font-variant-numeric:tabular-nums}
+  #rankSheet li .bar{position:relative;height:22px;border-radius:6px;background:rgba(255,255,255,.04);overflow:hidden}
+  #rankSheet li .bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,rgba(243,199,112,.35),rgba(243,199,112,.12));border-radius:6px}
+  #rankSheet li .bar span{position:relative;line-height:22px;padding-left:8px}
+  #rankSheet li .c{text-align:right;color:var(--gold);font-variant-numeric:tabular-nums}
+  #rankSheet li.kr .bar span{color:#fff}
+  #rankSheet .sh-kr{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--dim)}
+  #rankSheet .sh-sub{margin-top:6px;font-size:11.5px;color:var(--faint)}
   #ask{position:fixed;inset:0;z-index:16;display:none;align-items:center;justify-content:center;background:rgba(4,7,15,.45)}
   #ask.on{display:flex}
   #ask .box{background:rgba(10,14,30,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(243,199,112,.28);border-radius:20px;
@@ -171,19 +193,22 @@
     <span id="altLbl" hidden></span><span id="spdLbl" hidden></span>
   </div>
   <div class="controls ride-only">
-    <button class="btn steer" id="left" aria-label="왼쪽">‹</button>
-    <button class="btn warm drop" id="dropBtn" aria-label="선물 내려보내기"><span id="dropIc">🎁</span><b id="dropTx">출발</b></button>
-    <button class="btn steer" id="right" aria-label="오른쪽">›</button>
+    <button class="btn steer" id="left" aria-label="왼쪽"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg></button>
+    <button class="btn warm drop" id="dropBtn" aria-label="선물 내려보내기"><span id="dropIc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M3 7h18v3H3z"/><path d="M12 7v13"/><path d="M12 7C10.5 4 7 3.5 7 5.6 7 7 9.5 7 12 7z"/><path d="M12 7c1.5-3 5-3.5 5-1.4C17 7 14.5 7 12 7z"/></svg></span><b id="dropTx">출발</b></button>
+    <button class="btn steer" id="right" aria-label="오른쪽"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button>
   </div>
   <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물 · 화면 클릭(H) 버튼 숨기기</div>
 </div>
-<button class="btn corner exit ride-only icon" id="exitBtn" title="지구 보기">🌍</button>
-<button class="btn corner home ride-only icon" id="homeBtn" title="북극 산타 마을로" aria-label="북극 산타 마을로"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
+<button class="btn corner exit ride-only icon" id="exitBtn" title="지구 보기" aria-label="지구 보기"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.6 2.8 2.6 14.2 0 17"/><path d="M12 3.5c-2.6 2.8-2.6 14.2 0 17"/></svg></button>
+<button class="btn corner home ride-only icon" id="homeBtn" title="북극 산타 마을로" aria-label="북극 산타 마을로"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 12 4.5l8.5 7"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
+<div id="rankSheet" role="dialog" aria-modal="true"><div class="sheet"><div class="sh-h"><span>선물을 많이 받은 나라</span><button class="sh-x" id="rankClose" aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<ol id="rankList"></ol><div class="sh-kr" id="rankKr"></div><div class="sh-sub" id="rankSub"></div></div></div>
 <div id="ask" role="dialog" aria-modal="true"><div class="box"><div class="q">북극 산타 마을로 돌아갈까요?</div><div class="d">지금 날고 있는 곳을 떠나 마을 광장으로 가요</div><div class="row"><button class="btn" id="askNo">계속 날기</button><button class="btn warm" id="askYes">돌아가기</button></div></div></div>
 <canvas id="mini" class="ride-only" width="200" height="200"></canvas>
 <div id="fade"></div>
-<button class="btn corner view ride-only icon" id="viewBtn" title="시점 바꾸기">🎥</button>
-<button class="btn corner music on" id="musicBtn" title="음악 켜기/끄기">♪</button>
+<button class="btn corner view ride-only icon" id="viewBtn" title="시점 바꾸기" aria-label="시점 바꾸기"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 11.5C6.5 6.5 10.5 4 15.5 5.5l2.5 4"/><circle cx="18.6" cy="10.6" r="1.2"/><path d="M5 11.5h12.5"/><path d="M6.5 11.5v1.8a5.5 5.5 0 0 0 11 0v-1.8"/><path d="M9.6 14.2h.01"/><path d="M14.4 14.2h.01"/><path d="M10.2 16.6c1.1.7 2.5.7 3.6 0"/></svg></button>
+<button class="btn corner rankb icon" id="rankBtn" title="선물 많이 받은 나라" aria-label="선물 많이 받은 나라"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4.5h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 6.5H5.5a2.8 2.8 0 0 0 2.8 3.4"/><path d="M16 6.5h2.5a2.8 2.8 0 0 1-2.8 3.4"/><path d="M12 13v3.5"/><path d="M8.5 19.5h7"/><path d="M10 16.5h4v3h-4z"/></svg></button>
+<button class="btn corner music on" id="musicBtn" title="음악 켜기/끄기" aria-label="음악"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.5V6.5l10-2v11"/><circle cx="6.8" cy="17.5" r="2.2"/><circle cx="16.8" cy="15.5" r="2.2"/></svg></button>
 
 <div class="feed" id="feed"></div>
 <div id="toast"></div>
@@ -474,7 +499,11 @@ function renderRank(){
   else{const kr=ki===0?'대한민국이 <b>1위</b>예요':ki>0?`대한민국 <b>${ki+1}위</b> · 1위까지 ${fmt(top[0][1]-kc)}개`:'대한민국은 아직 선물을 못 받았어요';
     body=`<ol>${top.map((e,i)=>`<li><span>${i+1}. ${e[0]}</span><span class="c">${fmt(e[1])}</span></li>`).join('')}</ol><div class="kr">🇰🇷 ${kr}</div>`;}
   const html=`<h4><span>선물을 많이 받은 나라</span><span>${online?'모두의 기록':'내 기록'}</span></h4>${body}`;
-  $('rankSide').innerHTML=html;$('rankBottom').innerHTML=html;$('gifts').textContent=fmt(totalGifts);$('santas').textContent=fmt(santaN);$('santas2').textContent=fmt(santaN);$('mine').textContent=fmt(mine);}
+  $('rankSide').innerHTML=html;$('rankBottom').innerHTML=html;
+  {const top10=arr.slice(0,10),mx=top10.length?top10[0][1]:1;
+   $('rankList').innerHTML=top10.length?top10.map((e,i)=>`<li class="${e[0]==='대한민국'?'kr':''}"><span class="n">${i+1}</span><span class="bar"><i style="width:${Math.max(6,e[1]/mx*100)}%"></i><span>${e[0].replace(/[<>&]/g,'')}</span></span><span class="c">${fmt(e[1])}</span></li>`).join(''):'<li style="display:block;color:var(--dim)">아직 아무도 선물을 보내지 않았어요. 첫 번째 산타가 되어 주세요 🎁</li>';
+   $('rankKr').innerHTML='🇰🇷 '+(ki<0?'대한민국은 아직 선물을 못 받았어요':`대한민국 <b style="color:var(--ink);font-weight:400">${ki+1}위</b> · ${fmt(kc)}개`);
+   $('rankSub').textContent=(online?'모든 산타의 기록':'내 기록')+' · 모두의 선물 '+fmt(totalGifts)+'개';}$('gifts').textContent=fmt(totalGifts);$('santas').textContent=fmt(santaN);$('santas2').textContent=fmt(santaN);$('mine').textContent=fmt(mine);}
 renderRank();
 let whT;function whisper(s){const w=$('whisper');w.textContent=s;w.classList.add('show');clearTimeout(whT);whT=setTimeout(()=>w.classList.remove('show'),2600);}
 let toastT;function toast(m,s){const t=$('toast');t.innerHTML=m+(s?`<small>${s}</small>`:'');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
@@ -739,7 +768,7 @@ function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();co
   meMark.position.copy(RIDE.saved.p.clone().multiplyScalar(R+.012));meMark.visible=true;}
 function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};$('rideBtn').textContent='🛷 날던 곳에서 이어서 날기';$('newRide').style.display='';setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
   mode='toOrbit';document.body.classList.remove('ride');}
-$('viewBtn').onclick=()=>setView(view+1);$('homeBtn').onclick=()=>{if(mode==='ride')$('ask').classList.add('on');};$('askNo').onclick=()=>$('ask').classList.remove('on');$('askYes').onclick=()=>{$('ask').classList.remove('on');backToVillage();};$('ask').addEventListener('pointerdown',e=>{if(e.target.id==='ask')$('ask').classList.remove('on');});
+$('viewBtn').onclick=()=>setView(view+1);$('rankBtn').onclick=()=>{renderRank();$('rankSheet').classList.add('on');};$('rankClose').onclick=()=>$('rankSheet').classList.remove('on');$('rankSheet').addEventListener('pointerdown',e=>{if(e.target.id==='rankSheet')$('rankSheet').classList.remove('on');});$('homeBtn').onclick=()=>{if(mode==='ride')$('ask').classList.add('on');};$('askNo').onclick=()=>$('ask').classList.remove('on');$('askYes').onclick=()=>{$('ask').classList.remove('on');backToVillage();};$('ask').addEventListener('pointerdown',e=>{if(e.target.id==='ask')$('ask').classList.remove('on');});
 const SPOTS=['큰 트리 앞','선물 포장 공장','순록 마구간','산타 할아버지 집','요정들의 작업실','얼음 호수','쿠키 굽는 집','북극 우체국'];
 $('rideBtn').onclick=()=>{audioInit();enterRide(!RIDE.saved);};$('newRide').onclick=()=>{audioInit();enterRide(true);};$('exitBtn').onclick=exitRide;
 function rideDrop(){if(mode!=='ride')return;setFace('surprised',1.3);
@@ -748,7 +777,8 @@ function rideDrop(){if(mode!=='ride')return;setFace('surprised',1.3);
   dropAt(ground,true,start,.003,2.2);}
 const grounded=()=>(mode==='ride'||mode==='toRide')&&RIDE.t===0;
 function takeOff(){if(!grounded())return;setLvl(Math.max(2,RIDE.lvl));whisper('출발! 루돌프가 달리기 시작해요');}
-let dropState=null;function updDrop(){const g=grounded();if(g===dropState)return;dropState=g;const b=$('dropBtn');b.classList.toggle('go',g);$('dropIc').textContent=g?'🛷':'🎁';b.setAttribute('aria-label',g?'출발':'선물 내려보내기');}
+const ICON_SLEIGH='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17.5h14.5a3 3 0 0 0 3-3"/><path d="M6 17.5V15"/><path d="M14 17.5V15"/><path d="M4.5 15h12l2.5-5"/><path d="M4.5 15V8.5h5L11 11h6"/></svg>',ICON_GIFT='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M3 7h18v3H3z"/><path d="M12 7v13"/><path d="M12 7C10.5 4 7 3.5 7 5.6 7 7 9.5 7 12 7z"/><path d="M12 7c1.5-3 5-3.5 5-1.4C17 7 14.5 7 12 7z"/></svg>';
+let dropState=null;function updDrop(){const g=grounded();if(g===dropState)return;dropState=g;const b=$('dropBtn');b.classList.toggle('go',g);$('dropIc').innerHTML=g?ICON_SLEIGH:ICON_GIFT;b.setAttribute('aria-label',g?'출발':'선물 내려보내기');}
 $('dropBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(grounded())takeOff();else rideDrop();});
 const hold=(id,k)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();RIDE[k]=1;try{b.setPointerCapture(e.pointerId)}catch(_){}});['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>RIDE[k]=0));};
 hold('left','btnL');hold('right','btnR');
