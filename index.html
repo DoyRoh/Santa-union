@@ -4,7 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>산타 연합 — 지구 어디든 선물 떨어뜨리기</title>
-<meta name="theme-color" content="#060a18">
+<meta name="theme-color" content="#04070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="산타 연합">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -18,7 +24,8 @@
   html,body{margin:0;height:100%;overflow:hidden;background:#04070f;color:var(--ink);
     font-family:'Gowun Dodum',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
     touch-action:none;user-select:none;-webkit-user-select:none}
-  #stage{position:fixed;inset:0;display:block;width:100vw;height:100vh;height:100dvh}
+  #stage{position:fixed;left:0;top:0;display:block;width:100vw;height:100vh;height:100lvh}
+  html,body{background:#04070f}
   #snow{position:fixed;inset:0;pointer-events:none;width:100vw;height:100vh;height:100dvh;opacity:.75}
   #veil{position:fixed;inset:0;background:#04070f;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
     transition:opacity 1.6s ease;font-family:'Gowun Batang',serif}
@@ -948,7 +955,7 @@ function updateSun(){const [lon,lat]=subsolar();SUN_LOCAL.copy(ll2v(lon,lat)).no
 updateSun();setInterval(updateSun,30000);
 
 // ---------- loop ----------
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w<h?52:40;
+function resize(){const w=canvas.clientWidth||innerWidth,h=Math.max(canvas.clientHeight||0,innerHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w<h?52:40;
   if(!resize.done){camDist=w<h?3.4:4.1;camera.position.z=camDist;resize.done=1;}camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 const clock=new THREE.Clock();const tq=new THREE.Quaternion(),UP=new THREE.Vector3(0,1,0);
