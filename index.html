@@ -33,7 +33,7 @@
   .top{top:0;padding-top:max(18px,env(safe-area-inset-top))}
   .bottom{bottom:0;padding-bottom:max(18px,env(safe-area-inset-bottom))}
 
-  .title{font-family:'Gowun Batang',serif;font-size:25px;letter-spacing:3px;font-weight:700;
+  .title{text-align:center;padding-left:3px;font-family:'Gowun Batang',serif;font-size:25px;letter-spacing:3px;font-weight:700;
     text-shadow:0 0 22px rgba(243,199,112,.35)}
   .title small{display:block;text-align:center;font-family:'Gowun Dodum';font-weight:400;font-size:11.5px;letter-spacing:2.5px;color:var(--faint);margin-top:2px}
   .pill{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -745,7 +745,7 @@ function rideCamPose(){
     tgt=b.tgt.clone().lerp(a.tgt,k);}
   return {pos:globe.localToWorld(pos),tgt:globe.localToWorld(tgt),up:RIDE.p.clone().applyQuaternion(globe.quaternion).normalize()};}
 function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;whisper(VIEWS[view].replace('🎥 ',''));}
-function orbitCamPose(){return {pos:new THREE.Vector3(0,0,camDist),tgt:new THREE.Vector3(),up:new THREE.Vector3(0,1,0)};}
+function orbitCamPose(){const oy=innerWidth<innerHeight?.2*camDist/3.4:0;return {pos:new THREE.Vector3(0,oy,camDist),tgt:new THREE.Vector3(0,oy,0),up:new THREE.Vector3(0,1,0)};}
 
 function spawnVillage(slot){
   const a=((slot==null?Math.floor(Math.random()*SPOTS.length):slot)+.5)/SPOTS.length*Math.PI*2;const off=PLAZA.e1.clone().multiplyScalar(Math.cos(a)).add(PLAZA.e2.clone().multiplyScalar(Math.sin(a)));
