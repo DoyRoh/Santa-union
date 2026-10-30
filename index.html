@@ -83,6 +83,7 @@
   .drop span{font-size:30px}
   .corner{position:fixed;top:max(16px,env(safe-area-inset-top));font-size:13px;padding:8px 13px;z-index:5;color:var(--dim)}
   .exit{left:max(12px,env(safe-area-inset-left))}
+  .view{right:max(12px,env(safe-area-inset-right));top:calc(max(16px,env(safe-area-inset-top)) + 46px);font-size:12px;padding:7px 12px}
   .music{right:max(12px,env(safe-area-inset-right));width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px}
   .music.on{color:var(--gold);border-color:rgba(243,199,112,.4)}
   .over{font-size:13.5px}
@@ -121,7 +122,7 @@
 <div class="rank side-rank orbit-only" id="rankSide"></div>
 
 <div class="hud bottom">
-  <div class="hint orbit-only" id="hint">지구를 천천히 돌려보세요.<br>마음에 드는 곳을 <b>톡</b> 누르면 선물이 내려가요.</div>
+  <div class="hint orbit-only" id="hint">지구를 돌려 둘러보세요. 누르면 어디인지 알려줘요.<br>선물은 <b>썰매를 타고</b> 내려보낼 수 있어요.</div>
   <button class="btn warm orbit-only" id="rideBtn">🛷 북극 산타 마을에서 출발하기</button>
   <button class="btn orbit-only" id="newRide" style="display:none;font-size:12.5px;padding:7px 14px;color:var(--dim)">북극 산타 마을에서 새로 출발</button>
   <div class="rank orbit-only" id="rankBottom"></div>
@@ -132,9 +133,10 @@
     <button class="btn warm drop" id="dropBtn"><span>🎁</span>내려보내기</button>
     <button class="btn steer" id="right">▶</button>
   </div>
-  <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · 스페이스 선물</div>
+  <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물</div>
 </div>
 <button class="btn corner exit ride-only" id="exitBtn">🌍 지구 보기</button>
+<button class="btn corner view ride-only" id="viewBtn">🎥 앞에서 보기</button>
 <button class="btn corner music" id="musicBtn" title="음악">♪</button>
 
 <div class="feed" id="feed"></div>
@@ -448,7 +450,8 @@ canvas.addEventListener('pointermove',e=>{if(mode!=='orbit'){rideMove(e);return;
   const k=.0042*camDist/3.4;rotateBy(dx*k,dy*k);vel={x:dx*k,y:dy*k};idle=0;});
 function up(e){if(mode!=='orbit'){rideUp(e);return;}const tap=dragging&&moved<8&&pointers.size===1;pointers.delete(e.pointerId);if(pointers.size<2)pinch0=null;if(pointers.size===0)dragging=false;
   if(tap){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
-    const hit=ray.intersectObject(earth)[0];if(hit){dropAt(globe.worldToLocal(hit.point.clone()));vel={x:0,y:0};}}}
+    const hit=ray.intersectObject(earth)[0];if(hit){const l=globe.worldToLocal(hit.point.clone());const [lo,la]=v2ll(l);const c=countryAt(lo,la);
+      toast('여기는 '+(la>84?'북극 산타 마을':c?c.n:(la>66?'북극해':'바다')),'선물은 썰매를 타고 내려보낼 수 있어요 🛷');}}}
 canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(mode!=='orbit')return;camDist=THREE.MathUtils.clamp(camDist*(1+e.deltaY*.001),1.7,6);},{passive:false});
 
@@ -549,16 +552,26 @@ function sleighPose(){
   _x.crossVectors(RIDE.f,RIDE.p).normalize();_z.copy(RIDE.f).negate();
   _m.makeBasis(_x,RIDE.p,_z);sleigh.quaternion.setFromRotationMatrix(_m);sleigh.rotateZ(-RIDE.turn*.35);sleigh.rotateX(RIDE.climb||0);
   sleigh.position.copy(pos);return pos;}
-function rideCamPose(){
-  const F=RIDE.fc,up=RIDE.p.clone();const hh=RIDE.hNow;
+const VIEWS=['🎥 뒤에서 보기','🎥 앞에서 보기','🎥 옆에서 보기'];let view=0,viewPrev=0,viewT=1;
+function viewLocal(v){const F=RIDE.fc,P=RIDE.p,hh=RIDE.hNow;const right=new THREE.Vector3().crossVectors(F,P).normalize();
+  if(v===1){const sway=Math.sin(performance.now()/4000)*.012;
+    return {pos:P.clone().multiplyScalar(R+hh+.008).add(F.clone().multiplyScalar(.072)).add(right.clone().multiplyScalar(sway)),tgt:P.clone().multiplyScalar(R+hh+.002).add(F.clone().multiplyScalar(.012))};}
+  if(v===2)return {pos:P.clone().multiplyScalar(R+hh+.01).add(right.clone().multiplyScalar(.062)).add(F.clone().multiplyScalar(.014)),tgt:P.clone().multiplyScalar(R+hh+.0015).add(F.clone().multiplyScalar(.013))};
   const back=THREE.MathUtils.lerp(.07,.1,smooth(.004,.05,hh)),upo=THREE.MathUtils.lerp(.022,.05,smooth(.004,.05,hh));
-  const pos=RIDE.p.clone().multiplyScalar(R+hh+upo).add(F.clone().multiplyScalar(-back));
-  const tgt=RIDE.p.clone().multiplyScalar(R+hh-upo*.7).add(F.clone().multiplyScalar(.13));
-  return {pos:globe.localToWorld(pos),tgt:globe.localToWorld(tgt),up:up.applyQuaternion(globe.quaternion).normalize()};}
+  return {pos:P.clone().multiplyScalar(R+hh+upo).add(F.clone().multiplyScalar(-back)),tgt:P.clone().multiplyScalar(R+hh-upo*.7).add(F.clone().multiplyScalar(.13))};}
+function rideCamPose(){
+  const a=viewLocal(view);let pos=a.pos,tgt=a.tgt;
+  if(viewT<1){const b=viewLocal(viewPrev);const k=viewT<.5?4*viewT**3:1-Math.pow(-2*viewT+2,3)/2;
+    // swing around the sleigh instead of cutting through it
+    const c=RIDE.p.clone().multiplyScalar(R+RIDE.hNow);const da=b.pos.clone().sub(c),db=a.pos.clone().sub(c);
+    const r=THREE.MathUtils.lerp(da.length(),db.length(),k)+Math.sin(k*Math.PI)*.02;pos=c.clone().add(da.normalize().lerp(db.normalize(),k).normalize().multiplyScalar(r));
+    tgt=b.tgt.clone().lerp(a.tgt,k);}
+  return {pos:globe.localToWorld(pos),tgt:globe.localToWorld(tgt),up:RIDE.p.clone().applyQuaternion(globe.quaternion).normalize()};}
+function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;$('viewBtn').textContent=VIEWS[(view+1)%VIEWS.length].replace('보기','보기');}
 function orbitCamPose(){return {pos:new THREE.Vector3(0,0,camDist),tgt:new THREE.Vector3(),up:new THREE.Vector3(0,1,0)};}
 
 function enterRide(fresh){
-  if(mode!=='orbit')return;
+  if(mode!=='orbit')return;if(meMark)meMark.visible=false;
   if(!fresh&&RIDE.saved){const S=RIDE.saved;RIDE.p.copy(S.p);RIDE.f.copy(S.f);RIDE.fc.copy(S.f);RIDE.t=30;RIDE.hS=RIDE.h;RIDE.hNow=RIDE.h;RIDE.turn=0;RIDE.steer=0;vel={x:0,y:0};
     sleigh.visible=true;trail.visible=true;trLife.fill(0);sleighPose();globe.updateMatrixWorld();
     trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:3,to:'ride'};mode='toRide';document.body.classList.add('ride');
@@ -575,8 +588,13 @@ function enterRide(fresh){
   mode='toRide';document.body.classList.add('ride');
   toast('북극, 산타 마을','루돌프의 코에 불이 켜졌어요. 곧 출발해요');
 }
-function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};$('rideBtn').textContent='🛷 날던 곳에서 이어서 날기';$('newRide').style.display='';trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
+let meMark=null;
+function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();const g1=glow(0xffd48a,.045,.95);const g2=glow(0xff5a4a,.016,1);meMark.add(g1,g2);
+  const lb=textSprite('🛷 내 썰매');lb.scale.set(.12,.03,1);lb.position.y=.035;meMark.add(lb);meMark.userData.g=g1;globe.add(meMark);}
+  meMark.position.copy(RIDE.saved.p.clone().multiplyScalar(R+.012));meMark.visible=true;}
+function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};$('rideBtn').textContent='🛷 날던 곳에서 이어서 날기';$('newRide').style.display='';setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
   mode='toOrbit';document.body.classList.remove('ride');}
+$('viewBtn').onclick=()=>setView(view+1);
 $('rideBtn').onclick=()=>{audioInit();enterRide(false);};$('newRide').onclick=()=>{audioInit();enterRide(true);};$('exitBtn').onclick=exitRide;
 function rideDrop(){if(mode!=='ride')return;
   const start=RIDE.p.clone().multiplyScalar(R+RIDE.hNow+.002).add(RIDE.fc.clone().multiplyScalar(.004));
@@ -588,7 +606,7 @@ hold('left','btnL');hold('right','btnR');
 addEventListener('keydown',e=>{if(mode!=='ride')return;
   if(e.key==='ArrowLeft'||e.key==='a')RIDE.keyL=1;if(e.key==='ArrowRight'||e.key==='d')RIDE.keyR=1;
   if(e.key==='ArrowUp'&&!e.repeat)setLvl(RIDE.lvl+1);if(e.key==='ArrowDown'&&!e.repeat)setLvl(RIDE.lvl-1);if((e.key==='w'||e.key==='PageUp')&&!e.repeat)setAlt(RIDE.alt+1);if((e.key==='s'||e.key==='PageDown')&&!e.repeat)setAlt(RIDE.alt-1);
-  if(e.code==='Space'){e.preventDefault();if(!e.repeat)rideDrop();}if(e.key==='Escape')exitRide();});
+  if((e.key==='v'||e.key==='c')&&!e.repeat)setView(view+1);if(e.code==='Space'){e.preventDefault();if(!e.repeat)rideDrop();}if(e.key==='Escape')exitRide();});
 addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')RIDE.keyL=0;if(e.key==='ArrowRight'||e.key==='d')RIDE.keyR=0;});
 let rd=null;
 function rideDown(e){rd={x:e.clientX,y:e.clientY,m:0};}
@@ -597,7 +615,7 @@ function rideUp(){if(rd&&rd.m<8&&mode==='ride')rideDrop();rd=null;RIDE.drag=0;}
 
 let overT=0;
 function rideStep(dt){
-  RIDE.t+=dt;
+  RIDE.t+=dt;if(viewT<1)viewT=Math.min(1,viewT+dt/1.6);
   // takeoff: wait, then climb gently
   RIDE.hS+=(RIDE.h-RIDE.hS)*Math.min(1,dt*.6);const lift=smooth(1.6,7.5,RIDE.t);const prevH=RIDE.hNow;RIDE.hNow=THREE.MathUtils.lerp(.0045,RIDE.hS,lift);
   RIDE.climb=THREE.MathUtils.clamp((RIDE.hNow-prevH)/Math.max(dt,1e-4)*-6,-.35,.3);
@@ -723,6 +741,7 @@ function loop(){const dt=Math.min(clock.getDelta(),.05);idle+=dt;starMat.uniform
       a.fl=glow(a.land?0xffd38a:0x9fd0ff,a.sz*5,.95);a.fl.position.copy(a.end);globe.add(a.fl);}
     if(a.done){a.b+=dt;const k=a.b/1.4;a.fl.scale.setScalar(a.sz*(5-3.6*Math.min(1,k)));a.fl.material.opacity=.95*Math.max(0,1-k);
       if(k>=1){globe.remove(a.fl);a.fl.material.dispose();anims.splice(i,1);}}}
+  if(meMark&&meMark.visible){const k=.75+.25*Math.sin(clock.elapsedTime*3);meMark.userData.g.scale.setScalar(.045*k);meMark.children[2].visible=closeK<.3;}
   updatePeers(dt);if(mode==='ride')MP.pushPresence(false);
   renderer.render(scene,camera);requestAnimationFrame(loop);}
 loop();
