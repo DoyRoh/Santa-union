@@ -57,12 +57,15 @@
   .hint{font-size:13.5px;color:var(--dim);transition:opacity .8s;text-align:center;line-height:1.6}
   .hint b{color:var(--ink);font-weight:400}
 
-  #toast{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%) translateY(6px);opacity:0;pointer-events:none;z-index:6;
-    background:rgba(10,14,30,.66);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(243,199,112,.28);
-    color:var(--ink);border-radius:18px;padding:13px 22px;font-size:17px;text-align:center;font-family:'Gowun Batang',serif;
-    box-shadow:0 10px 50px rgba(0,0,0,.5),0 0 40px rgba(243,199,112,.08);transition:opacity .45s,transform .45s;max-width:86vw;word-break:keep-all}
+  #toast{position:fixed;left:50%;top:27%;transform:translate(-50%,-50%) translateY(6px);opacity:0;pointer-events:none;z-index:6;
+    color:var(--ink);font-size:16px;text-align:center;font-family:'Gowun Batang',serif;letter-spacing:.3px;
+    text-shadow:0 1px 14px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.8);transition:opacity .7s,transform .7s;max-width:80vw;word-break:keep-all}
   #toast.show{opacity:1;transform:translate(-50%,-50%)}
-  #toast small{display:block;font-family:'Gowun Dodum';font-size:12.5px;color:var(--dim);margin-top:4px}
+  #toast small{display:block;font-family:'Gowun Dodum';font-size:12px;color:var(--dim);margin-top:5px}
+  #whisper{position:fixed;left:0;right:0;top:calc(max(16px,env(safe-area-inset-top)) + 44px);text-align:center;font-size:11.5px;color:var(--dim);
+    letter-spacing:.5px;opacity:0;transition:opacity 1.2s;pointer-events:none;z-index:3;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+  #whisper.show{opacity:1}
+  body:not(.ride) #whisper{top:auto;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 6px)}
 
   .feed{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:calc(max(18px,env(safe-area-inset-bottom)) + 236px);z-index:2;
     pointer-events:none;display:flex;flex-direction:column;gap:4px;font-size:11.5px;max-width:62vw}
@@ -70,7 +73,7 @@
   .feed div b{color:var(--dim);font-weight:400}
   @keyframes fade{0%{opacity:0;transform:translateY(6px)}8%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
   body.ride .over{margin-top:2px}
-  body.ride .feed{bottom:calc(max(18px,env(safe-area-inset-bottom)) + 256px)}
+  body.ride .feed{bottom:calc(max(18px,env(safe-area-inset-bottom)) + 150px)}
 
   .btn{pointer-events:auto;border:1px solid var(--line);background:var(--glass);color:var(--ink);font:inherit;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:999px;padding:11px 22px;font-size:15px;cursor:pointer;transition:transform .15s,background .3s}
@@ -80,10 +83,18 @@
   .ride-only{display:none!important}
   body.ride .ride-only{display:flex!important}
   body.ride .orbit-only{display:none!important}
-  .controls{gap:16px;align-items:center;justify-content:center}
-  .steer{width:58px;height:58px;border-radius:50%;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;color:var(--dim)}
-  .drop{width:88px;height:88px;border-radius:50%;padding:0;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
-  .drop span{font-size:30px}
+  .controls{gap:26px;align-items:center;justify-content:center;margin-top:2px}
+  .steer{width:52px;height:52px;border-radius:50%;padding:0 0 3px;font-size:30px;line-height:1;display:flex;align-items:center;justify-content:center;color:var(--dim);background:rgba(8,13,30,.32)}
+  .drop{width:68px;height:68px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center}
+  .drop span{font-size:28px}
+  .tune{pointer-events:auto;align-items:center;gap:7px;background:rgba(8,13,30,.38);border:1px solid var(--line);border-radius:999px;padding:4px 8px 4px 13px;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:11.5px;color:var(--faint)}
+  .tune .tl{letter-spacing:.5px}
+  .tune button{width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:15px;cursor:pointer;padding:0;line-height:1}
+  .tune .pips{display:flex;gap:3px}
+  .tune .pips i{width:5px;height:5px;border-radius:50%;background:rgba(251,243,228,.2)}
+  .tune .pips i.on{background:var(--gold)}
+  .tune .sep{width:1px;height:16px;background:var(--line);margin:0 4px}
   .corner{position:fixed;top:max(16px,env(safe-area-inset-top));font-size:13px;padding:8px 13px;z-index:5;color:var(--dim)}
   .exit{left:max(12px,env(safe-area-inset-left))}
   .icon{width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -113,7 +124,7 @@
   .speed .pips i.on{background:var(--gold);box-shadow:0 0 6px rgba(243,199,112,.6)}
   .speed button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit;font-size:17px;cursor:pointer;padding:0}
   .keys{font-size:11.5px;color:var(--faint)}
-  @media (max-width:899px){.keys{display:none!important}}
+  @media (max-width:899px){.keys,body.ride .keys{display:none!important}}
   @media (min-width:900px){
     .side-rank{position:fixed;right:22px;top:72px;width:250px;z-index:3}
     .bottom .rank{display:none}
@@ -144,12 +155,16 @@
   <button class="btn warm orbit-only" id="rideBtn">🛷 북극 산타 마을에서 출발하기</button>
   <button class="btn orbit-only" id="newRide" style="display:none;font-size:12.5px;padding:7px 14px;color:var(--dim)">북극 산타 마을에서 새로 출발</button>
   <div class="rank orbit-only" id="rankBottom"></div>
-  <div class="speed ride-only"><span>높이</span><button id="lower">−</button><span class="lbl" id="altLbl">-</span><span class="pips" id="apips"></span><button id="higher">+</button></div>
-  <div class="speed ride-only"><span>속도</span><button id="slower">−</button><span class="lbl" id="spdLbl">-</span><span class="pips" id="pips"></span><button id="faster">+</button></div>
+  <div class="tune ride-only">
+    <span class="tl">높이</span><button id="lower" aria-label="낮게">−</button><span class="pips" id="apips"></span><button id="higher" aria-label="높게">+</button>
+    <i class="sep"></i>
+    <span class="tl">속도</span><button id="slower" aria-label="느리게">−</button><span class="pips" id="pips"></span><button id="faster" aria-label="빠르게">+</button>
+    <span id="altLbl" hidden></span><span id="spdLbl" hidden></span>
+  </div>
   <div class="controls ride-only">
-    <button class="btn steer" id="left">◀</button>
-    <button class="btn warm drop" id="dropBtn"><span>🎁</span>내려보내기</button>
-    <button class="btn steer" id="right">▶</button>
+    <button class="btn steer" id="left" aria-label="왼쪽">‹</button>
+    <button class="btn warm drop" id="dropBtn" aria-label="선물 내려보내기"><span>🎁</span></button>
+    <button class="btn steer" id="right" aria-label="오른쪽">›</button>
   </div>
   <div class="keys ride-only">← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물</div>
 </div>
@@ -163,6 +178,7 @@
 
 <div class="feed" id="feed"></div>
 <div id="toast"></div>
+<div id="whisper"></div>
 
 <script src="three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -384,14 +400,15 @@ const placed=[],MAX_PLACED=240,anims=[];
 // bots: soft golden lights on surface
 const BOT_MAX=4000;const botPos=new Float32Array(BOT_MAX*3);let botN=0;
 const botGeo=new THREE.BufferGeometry();botGeo.setAttribute('position',new THREE.BufferAttribute(botPos,3));botGeo.setDrawRange(0,0);
-{const ph=new Float32Array(BOT_MAX);for(let i=0;i<BOT_MAX;i++)ph[i]=Math.random();botGeo.setAttribute('aPh',new THREE.BufferAttribute(ph,1));}
+{const ph=new Float32Array(BOT_MAX);for(let i=0;i<BOT_MAX;i++)ph[i]=Math.random();botGeo.setAttribute('aPh',new THREE.BufferAttribute(ph,1));botGeo.setAttribute('aGl',new THREE.BufferAttribute(new Float32Array(BOT_MAX),1));}
 const botMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
   uniforms:{time:{value:0},size:{value:.011},scale:{value:400}},
-  vertexShader:`attribute float aPh;uniform float time,size,scale;varying float vA;
+  vertexShader:`attribute float aPh,aGl;uniform float time,size,scale;varying float vA;varying float vG;
     void main(){vec4 mv=modelViewMatrix*vec4(position,1.);float tw=.5+.5*sin(time*(1.2+aPh*2.2)+aPh*40.);vA=.35+.65*tw*tw;
-      gl_PointSize=clamp(size*scale/-mv.z,3.5,10.)*(.75+.35*tw);gl_Position=projectionMatrix*mv;}`,
-  fragmentShader:`varying float vA;void main(){float r=length(gl_PointCoord-.5);float a=smoothstep(.5,.0,r);a*=a;float core=smoothstep(.18,.0,r);
-    gl_FragColor=vec4((vec3(1.,.82,.5)*a+vec3(1.,.97,.9)*core)*vA,1.);}`});
+      vG=aGl;gl_PointSize=clamp(size*scale/-mv.z,2.5,8.)*(.7+.35*tw)*(1.+aGl*.9);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float vA;varying float vG;void main(){float r=length(gl_PointCoord-.5);float a=smoothstep(.5,.0,r);a*=a;float core=smoothstep(.18,.0,r);
+    gl_FragColor=vec4((vec3(1.,.82,.5)*a+vec3(1.,.97,.9)*core)*vA*(.75+vG*.9),1.);}`});
+const HOT=[];for(let i=0;i<70;i++){const s=glow(0xffc477,.05,0);s.visible=false;s.userData.b=.05;s.userData.o=0;globe.add(s);HOT.push(s);}
 const botPts=new THREE.Points(botGeo,botMat);
 globe.add(botPts);
 
@@ -399,7 +416,13 @@ globe.add(botPts);
 const counts=new Map();let totalGifts=0,mine=0,myGifts=[],myCountries={};
 let nick='산타 #'+(1000+Math.floor(Math.random()*9000));$('myname').textContent=nick;
 let santaN=1,online=false;
-function setBots(list){const n=Math.min(list.length,BOT_MAX);for(let i=0;i<n;i++){const [lon,lat]=list[list.length-n+i];const v=ll2v(lon,lat,R*1.0006);botPos.set([v.x,v.y,v.z],i*3);}
+function setBots(list){const n=Math.min(list.length,BOT_MAX);const cells=new Map();const keys=new Array(n);
+  for(let i=0;i<n;i++){const [lon,lat]=list[list.length-n+i];const v=ll2v(lon,lat,R*1.0006);botPos.set([v.x,v.y,v.z],i*3);
+    const k=Math.floor((lat+90)/3)*1000+Math.floor((lon+180)/3);keys[i]=k;let c=cells.get(k);if(!c){c={n:0,v:new THREE.Vector3()};cells.set(k,c);}c.n++;c.v.add(v);}
+  const gl=botGeo.attributes.aGl.array;for(let i=0;i<n;i++){const c=cells.get(keys[i]).n;gl[i]=Math.min(1,Math.log2(c)/5);}botGeo.attributes.aGl.needsUpdate=true;
+  const hot=[...cells.values()].filter(c=>c.n>=3).sort((a,b)=>b.n-a.n);
+  HOT.forEach((s,i)=>{const c=hot[i];if(!c){s.visible=false;return;}s.visible=true;s.position.copy(c.v.clone().normalize().multiplyScalar(R*1.001));
+    const k=Math.min(1,Math.log2(c.n)/6);s.userData.b=.025+.06*k;s.userData.o=.18+.45*k;});
   botN=n;botGeo.setDrawRange(0,n);botGeo.attributes.position.needsUpdate=true;}
 function renderRank(){
   const arr=[...counts.entries()].sort((a,b)=>b[1]-a[1]);const top=arr.slice(0,3);const ki=arr.findIndex(e=>e[0]==='대한민국');const kc=counts.get('대한민국')||0;
@@ -410,6 +433,7 @@ function renderRank(){
   const html=`<h4><span>선물을 많이 받은 나라</span><span>${online?'모두의 기록':'내 기록'}</span></h4>${body}`;
   $('rankSide').innerHTML=html;$('rankBottom').innerHTML=html;$('gifts').textContent=fmt(totalGifts);$('santas').textContent=fmt(santaN);$('santas2').textContent=fmt(santaN);$('mine').textContent=fmt(mine);}
 renderRank();
+let whT;function whisper(s){const w=$('whisper');w.textContent=s;w.classList.add('show');clearTimeout(whT);whT=setTimeout(()=>w.classList.remove('show'),2600);}
 let toastT;function toast(m,s){const t=$('toast');t.innerHTML=m+(s?`<small>${s}</small>`:'');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
 function feed(h){const f=$('feed');const d=document.createElement('div');d.innerHTML=h;f.appendChild(d);while(f.children.length>3)f.firstChild.remove();setTimeout(()=>d.remove(),6000);}
 const SEA=[['고래가 받았어요 🐋','바다 깊이 천천히 가라앉는 중'],['물고기들이 받았어요 🐟','포장지는 해파리가 가져갔대요'],['문어가 받았어요 🐙','다리 여덟 개로 조심조심 여는 중'],
@@ -465,7 +489,7 @@ let songIdx=Math.floor(Math.random()*SONGS.length);
 function mbox(f,t,d,v){tone(f,t,d,v);tone(f*2.0,t,.6,v*.18);tone(f*3.01,t,.25,v*.06);}
 function playSong(){if(!musicOn)return;const song=SONGS[songIdx%SONGS.length];songIdx++;
   const beat=60/song.bpm*1.12;let t=AC.currentTime+.3,b=0;
-  toast('♪ '+song.t,'오르골로 듣는 크리스마스');
+  whisper('♪  '+song.t);
   song.n.forEach(([n,d])=>{const m=nn(n)+12;const f=NF(m);const hum=rand(-.01,.01);mbox(f*(1+hum*.02),t+rand(0,.012),Math.min(3.2,d*beat*1.9),.1);
     if(Math.abs(b%song.bar)<.01){tone(NF(bassFor(m-12)),t,beat*song.bar*1.1,.055,'triangle');}
     t+=d*beat;b+=d;});
@@ -503,8 +527,8 @@ function setLvl(l){RIDE.lvl=Math.max(0,Math.min(SPEEDS.length-1,l));$('spdLbl').
 function setAlt(a){RIDE.alt=Math.max(0,Math.min(ALTS.length-1,a));RIDE.h=ALTS[RIDE.alt].v;$('altLbl').textContent=ALTS[RIDE.alt].n;
   [...$('apips').children].forEach((e,i)=>e.classList.toggle('on',i<=RIDE.alt));}
 {const ap=$('apips');ALTS.forEach(()=>ap.appendChild(document.createElement('i')));}
-setAlt(3);$('lower').onclick=()=>setAlt(RIDE.alt-1);$('higher').onclick=()=>setAlt(RIDE.alt+1);
-setLvl(2);$('slower').onclick=()=>setLvl(RIDE.lvl-1);$('faster').onclick=()=>setLvl(RIDE.lvl+1);
+setAlt(3);$('lower').onclick=()=>{setAlt(RIDE.alt-1);whisper('높이 · '+ALTS[RIDE.alt].n);};$('higher').onclick=()=>{setAlt(RIDE.alt+1);whisper('높이 · '+ALTS[RIDE.alt].n);};
+setLvl(2);$('slower').onclick=()=>{setLvl(RIDE.lvl-1);whisper('속도 · '+SPEEDS[RIDE.lvl].n);};$('faster').onclick=()=>{setLvl(RIDE.lvl+1);whisper('속도 · '+SPEEDS[RIDE.lvl].n);};
 
 function makeSleigh(){
   const g=new THREE.Group();const s=.0055;
@@ -604,7 +628,7 @@ function rideCamPose(){
     const r=THREE.MathUtils.lerp(da.length(),db.length(),k)+Math.sin(k*Math.PI)*.02;pos=c.clone().add(da.normalize().lerp(db.normalize(),k).normalize().multiplyScalar(r));
     tgt=b.tgt.clone().lerp(a.tgt,k);}
   return {pos:globe.localToWorld(pos),tgt:globe.localToWorld(tgt),up:RIDE.p.clone().applyQuaternion(globe.quaternion).normalize()};}
-function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;toast(VIEWS[view].replace('🎥 ',''),'');}
+function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;whisper(VIEWS[view].replace('🎥 ',''));}
 function orbitCamPose(){return {pos:new THREE.Vector3(0,0,camDist),tgt:new THREE.Vector3(),up:new THREE.Vector3(0,1,0)};}
 
 function spawnVillage(){
@@ -708,7 +732,7 @@ function rideStep(dt){
     for(let k=0;k<2;k++){const j=new THREE.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).multiplyScalar(.0018);const q=wp.clone().add(j);trPos.set([q.x,q.y,q.z],trI*3);trLife[trI]=1;trI=(trI+1)%TRN;}}
   for(let i=0;i<TRN;i++){trLife[i]=Math.max(0,trLife[i]-dt*.55);const L=trLife[i];trCol.set([L,L*.82,L*.5],i*3);}
   trGeo.attributes.position.needsUpdate=true;trGeo.attributes.color.needsUpdate=true;
-  miniT-=dt;if(miniT<=0&&mode==='ride'){miniT=.25;drawMini();}
+  miniT-=dt;if(miniT<=0&&(mode==='ride'||mode==='toRide')){miniT=.25;drawMini();}
   overT-=dt;if(overT<=0){overT=.35;const [lon,lat]=v2ll(RIDE.p);const c=countryAt(lon,lat);
     $('over').textContent=lat>84?'북극 산타 마을':c?c.n:(lat>66?'북극해':'바다');}
 }
@@ -819,6 +843,7 @@ function loop(){const dt=Math.min(clock.getDelta(),.05);idle+=dt;starMat.uniform
     if(a.done){a.b+=dt;const k=a.b/1.4;a.fl.scale.setScalar(a.sz*(5-3.6*Math.min(1,k)));a.fl.material.opacity=.95*Math.max(0,1-k);
       if(k>=1){globe.remove(a.fl);a.fl.material.dispose();anims.splice(i,1);}}}
   if(meMark&&meMark.visible){const k=.75+.25*Math.sin(clock.elapsedTime*3);meMark.userData.g.scale.setScalar(.045*k);meMark.children[2].visible=closeK<.3;}
+  {const kk=1-closeK*.85,tw=clock.elapsedTime;HOT.forEach((s,i)=>{if(!s.visible)return;s.scale.setScalar(s.userData.b*kk*(.9+.1*Math.sin(tw*1.3+i)));s.material.opacity=s.userData.o*(.8+.2*Math.sin(tw*.9+i*1.7));});}
   updatePeers(dt);if(mode==='ride')MP.pushPresence(false);
   renderer.render(scene,camera);requestAnimationFrame(loop);}
 loop();
