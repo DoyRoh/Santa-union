@@ -960,9 +960,11 @@ let chan=null,chanReady=false,lastPos=0;
 const MP={
   sendGift(lon,lat,key){LS.set('santa.mine',String(mine));
     const g={id:myId,n:nick,lon:+lon.toFixed(2),lat:+lat.toFixed(2),k:key};
-    if(chanReady)chan.send({type:'broadcast',event:'gift',payload:g}).catch(()=>{});
-    if(sb)sb.from('gifts').insert({lon:g.lon,lat:g.lat,country:key,santa:nick}).then(({error})=>{if(error)console.warn(error.message)});
-    if(online){totalGifts++;if(key!=='바다'&&key!=='산타 마을')counts.set(key,(counts.get(key)||0)+1);statPts.push([g.lon,g.lat]);setBots(statPts);renderRank();}},
+    const count=()=>{if(!online)return;totalGifts++;if(key!=='바다'&&key!=='산타 마을')counts.set(key,(counts.get(key)||0)+1);statPts.push([g.lon,g.lat]);setBots(statPts);renderRank();};
+    if(!sb){count();return;}
+    sb.from('gifts').insert({lon:g.lon,lat:g.lat,country:key,santa:nick}).then(({error})=>{
+      if(error){console.warn(error.message);whisper('선물이 너무 빨라요. 루돌프가 잠깐 숨 고르는 중');return;}
+      count();if(chanReady)chan.send({type:'broadcast',event:'gift',payload:g}).catch(()=>{});});},
   pushPresence(force){if(!chanReady)return;const now=performance.now();if(!force&&now-lastPos<250)return;lastPos=now;
     const ride=mode==='ride'||mode==='toRide'||RIDE.flying;
     const st={id:myId,n:nick,m:ride?'r':'o'};
