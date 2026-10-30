@@ -710,7 +710,7 @@ function viewLocal(v){const F=RIDE.fc,P=RIDE.p,hh=RIDE.hNow;const right=new THRE
     return {pos:P.clone().multiplyScalar(R+hh+.008).add(F.clone().multiplyScalar(.072)).add(right.clone().multiplyScalar(sway)),tgt:P.clone().multiplyScalar(R+hh+.002).add(F.clone().multiplyScalar(.012))};}
   if(v===3){const head=P.clone().multiplyScalar(R+hh+.0102).add(F.clone().multiplyScalar(-.0006));
     return {pos:head.clone().add(F.clone().multiplyScalar(.0195)).add(P.clone().multiplyScalar(.005)).add(right.clone().multiplyScalar(Math.sin(performance.now()/5000)*.003)),tgt:head};}
-  if(v===2)return {pos:P.clone().multiplyScalar(R+hh+.01).add(right.clone().multiplyScalar(.062)).add(F.clone().multiplyScalar(.014)),tgt:P.clone().multiplyScalar(R+hh+.0015).add(F.clone().multiplyScalar(.013))};
+  if(v===2)return {pos:P.clone().multiplyScalar(R+hh+.017).add(right.clone().multiplyScalar(.05)).add(F.clone().multiplyScalar(.014)),tgt:P.clone().multiplyScalar(R+hh+.0015).add(F.clone().multiplyScalar(.013))};
   const back=THREE.MathUtils.lerp(.07,.1,smooth(.004,.05,hh)),upo=THREE.MathUtils.lerp(.022,.05,smooth(.004,.05,hh));
   return {pos:P.clone().multiplyScalar(R+hh+upo).add(F.clone().multiplyScalar(-back)),tgt:P.clone().multiplyScalar(R+hh-upo*.7).add(F.clone().multiplyScalar(.13))};}
 function rideCamPose(){
