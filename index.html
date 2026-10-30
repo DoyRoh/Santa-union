@@ -990,7 +990,16 @@ function updatePeers(dt){const now=performance.now();
     P.obj.far.scale.setScalar(.03-.024*closeK);P.obj.model.visible=closeK>.3;P.obj.label.visible=closeK>.3;}}
 let statPts=[];
 async function loadStats(){if(!sb)return;try{const {data,error}=await sb.rpc('sky_stats');if(error||!data)return;
-  online=true;totalGifts=+data.total||0;counts.clear();(data.countries||[]).forEach(r=>counts.set(r.c,+r.n));statPts=(data.points||[]).slice().reverse();setBots(statPts);renderRank();}catch(e){}}
+  online=true;
+  // the server snapshot can be a moment behind gifts already shown on screen, so never step a number backwards;
+  // if the server still hasn't caught up on the next refresh, trust the server.
+  const keep=(cur,db,k)=>{if(cur>db&&lastDb.get(k)!==db){lastDb.set(k,db);return cur;}lastDb.set(k,db);return db;};
+  totalGifts=keep(totalGifts,+data.total||0,'__total');
+  const next=new Map();(data.countries||[]).forEach(r=>next.set(r.c,keep(counts.get(r.c)||0,+r.n,r.c)));
+  counts.forEach((v,k)=>{if(!next.has(k)&&!lastDb.has(k)){next.set(k,v);lastDb.set(k,-1);}});
+  counts.clear();next.forEach((v,k)=>counts.set(k,v));
+  const pts=(data.points||[]).slice().reverse();if(pts.length>=statPts.length||!online)statPts=pts;setBots(statPts);renderRank();}catch(e){}}
+const lastDb=new Map();
 if(sb){
   loadStats();setInterval(loadStats,60000);
   chan=sb.channel('sky',{config:{presence:{key:myId},broadcast:{self:false}}});
