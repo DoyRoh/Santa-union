@@ -235,7 +235,9 @@
   body.solar .joy,body.zen .joy{display:none}
   body.ride #left,body.ride #right{display:none!important}
   body.ride .controls{width:100%;box-sizing:border-box;justify-content:flex-end;padding-right:max(26px,env(safe-area-inset-right));margin-top:6px}
-  body.ride .drop{width:72px;height:72px}
+  body.ride .drop{width:72px;height:72px;position:fixed;right:max(26px,env(safe-area-inset-right));bottom:calc(max(22px,env(safe-area-inset-bottom)) + 20px);z-index:7}
+  body.ride .hud.bottom{padding-bottom:calc(max(22px,env(safe-area-inset-bottom)) + 124px)}
+  body.ride .feed{bottom:calc(max(18px,env(safe-area-inset-bottom)) + 190px)!important}
   body.ride .tune{margin-bottom:22px}
   #walkHud .vb svg{width:20px;height:20px}
   body.walk #walkHud .wacts{left:150px;justify-content:flex-start;bottom:max(30px,env(safe-area-inset-bottom))}
@@ -886,7 +888,7 @@ function renderRank(){
 renderRank();
 let whT;function whisper(s){s=TR(s);const w=$('whisper');w.textContent=s;w.classList.add('show');clearTimeout(whT);whT=setTimeout(()=>w.classList.remove('show'),2600);}
 let toastT;function toast(m,s){m=TR(m);s=s&&TR(s);const t=$('toast');t.innerHTML=m+(s?`<small>${s}</small>`:'');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
-function feed(h){const f=$('feed');const d=document.createElement('div');d.innerHTML=h;f.appendChild(d);while(f.children.length>3)f.firstChild.remove();setTimeout(()=>d.remove(),6000);}
+function feed(h){h=TR(h);const f=$('feed');const d=document.createElement('div');d.innerHTML=h;f.appendChild(d);while(f.children.length>3)f.firstChild.remove();setTimeout(()=>d.remove(),6000);}
 const SEA=[['고래가 받았어요 🐋','바다 깊이 천천히 가라앉는 중'],['물고기들이 받았어요 🐟','포장지는 해파리가 가져갔대요'],['문어가 받았어요 🐙','다리 여덟 개로 조심조심 여는 중'],
   ['거북이가 받았어요 🐢','다 열어보려면 백 년쯤 걸린대요'],['돌고래가 받았어요 🐬','신나서 세 번 뛰어올랐어요'],['인어가 받았어요 🧜','답장은 유리병에 넣어 보낸대요'],['등대지기가 건졌어요 🗼','오늘 밤은 외롭지 않겠네요']];
 const SPECIAL={'대한민국':['대한민국에 도착했어요 🇰🇷','어느 집 굴뚝으로 쏙 들어갔어요'],'Antarctica':['펭귄이 받았어요 🐧','남극에도 크리스마스는 와요'],'남극':['펭귄이 받았어요 🐧','남극에도 크리스마스는 와요'],
