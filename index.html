@@ -160,7 +160,7 @@
   #walkHud .wtop .btn{font-size:12.5px;padding:7px 14px}
   #walkHud .wt{font-family:'Gowun Batang',serif;font-size:18px;text-shadow:0 1px 10px #000;text-align:center}
   #walkHud .wt small{display:block;font-family:'Gowun Dodum';font-size:11.5px;color:var(--gold)}
-  #walkHud .whint{position:fixed;left:0;right:0;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 64px);text-align:center;font-size:12px;color:var(--dim);text-shadow:0 1px 8px #000;z-index:6;transition:opacity 1s}
+  #walkHud .whint{position:fixed;left:0;right:0;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 150px);text-align:center;font-size:12px;color:var(--dim);text-shadow:0 1px 8px #000;z-index:6;transition:opacity 1s}
   #walkHud .wacts{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 12px;z-index:6}
   #walkHud .wacts button{border:1px solid var(--line);background:rgba(10,14,30,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:inherit;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer}
   #walkHud .wacts button.dim{opacity:.45}
@@ -225,6 +225,21 @@
   .wrapbar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:40px;letter-spacing:6px}
   html[lang=en] .title{font-size:20px;letter-spacing:1px}
   html[lang=en] .title small{letter-spacing:1px}
+  .joy{position:fixed;left:max(22px,env(safe-area-inset-left));bottom:max(22px,env(safe-area-inset-bottom));width:112px;height:112px;border-radius:50%;z-index:7;display:none;pointer-events:auto;touch-action:none;
+    background:radial-gradient(circle,rgba(255,255,255,.04) 0 55%,rgba(255,255,255,.1) 56% 57%,rgba(255,255,255,.03) 58%);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .joy .knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(251,243,228,.88);box-shadow:0 4px 14px rgba(0,0,0,.4);transition:transform .15s}
+  .joy.on .knob{transition:none}
+  body.ride .joy,body.walk .joy{display:block}
+  body.solar .joy,body.zen .joy{display:none}
+  body.ride #left,body.ride #right{display:none!important}
+  body.ride .controls{width:100%;box-sizing:border-box;justify-content:flex-end;padding-right:max(26px,env(safe-area-inset-right));margin-top:6px}
+  body.ride .drop{width:72px;height:72px}
+  body.ride .tune{margin-bottom:22px}
+  #walkHud .vb svg{width:20px;height:20px}
+  body.walk #walkHud .wacts{left:150px;justify-content:flex-start;bottom:max(30px,env(safe-area-inset-bottom))}
+  #walkHud .wrow{display:flex;gap:8px}
+  #walkHud .wrow .btn{font-size:12.5px;padding:7px 14px}
+  #walkHud .vb{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center}
   .zin{display:none!important}
   body.flying:not(.ride) #exitBtn{display:flex!important}
   body.flying:not(.ride) #exitBtn .zin{display:block!important}
@@ -341,8 +356,9 @@
 <button class="btn wishb zhide" id="wishBtn" hidden>소원 빌기</button>
 <div id="solarHud"><button class="btn" id="solarBack">지구로 돌아가기</button><div class="st">태양계</div><div class="sd" id="solarDate"></div></div>
 <div id="placeBar" class="placebar zhide"></div>
-<div id="walkHud"><div class="wtop"><button class="btn" id="walkExit">썰매로 돌아가기</button><div class="wt"><b id="walkTitle"></b><small id="walkCnt"></small></div></div>
-<div class="whint" id="walkHint">화면을 누른 채 끌어서 걸어요</div><div class="wacts" id="walkActs"></div></div>
+<div id="joy" class="joy"><div class="knob"></div></div>
+<div id="walkHud"><div class="wtop"><div class="wrow"><button class="btn" id="walkExit">썰매로 돌아가기</button><button class="btn" id="walkView">시점 바꾸기</button></div><div class="wt"><b id="walkTitle"></b><small id="walkCnt"></small></div></div>
+<div class="whint" id="walkHint">왼쪽 아래 동그라미를 밀어서 걸어요</div><div class="wacts" id="walkActs"></div></div>
 <div id="roomOv"><div class="rbox"><div class="rh"><span id="roomTitle"></span><span class="rc" id="roomCnt"></span><button class="btn" id="roomExit">나가기</button></div>
 <div class="rstage" id="roomStage"></div><div class="rinfo" id="roomInfo"></div><div class="racts" id="roomActs"></div></div></div>
 <div id="badgeSheet" class="sheetwrap"><div class="sheet"><div class="sh-h"><span>나의 산타 배지</span><button class="sh-x" data-close>✕</button></div>
@@ -397,7 +413,7 @@ const D={
 '대한민국에 도착했어요 🇰🇷':'Delivered to South Korea 🇰🇷','어느 집 굴뚝으로 쏙 들어갔어요':'Straight down a chimney','펭귄이 받았어요 🐧':'A penguin got it 🐧','남극에도 크리스마스는 와요':'Christmas comes to Antarctica too',
 '그린란드에 도착 ❄️':'Delivered to Greenland ❄️','산타 마을 이웃이라 배송비 무료':"Free shipping — Santa's neighbors",'핀란드에 도착 🦌':'Delivered to Finland 🦌','순록들이 반갑게 맞아줬어요':'The reindeer said hi',
 '일본에 도착했어요':'Delivered to Japan','이웃 나라에도 따뜻한 밤':'A warm night for the neighbors','러시아에 도착했어요':'Delivered to Russia','너무 넓어서 아직 배달 중이에요':'So big it is still being delivered',
-'산타 #':'Santa #','배지와 공유':'Badges & share','태양계 보기':'Solar system','지구로 돌아가기':'Back to Earth','태양계':'Solar System','나의 산타 배지':'My Santa badges',
+'산타 #':'Santa #','시점 바꾸기':'Change view','썰매 타기':'Back to the sleigh','왼쪽 아래 동그라미를 밀어서 걸어요':'Push the circle at the bottom left to walk','배지와 공유':'Badges & share','태양계 보기':'Solar system','지구로 돌아가기':'Back to Earth','태양계':'Solar System','나의 산타 배지':'My Santa badges',
 '공유 카드 만들기':'Make a share card','친구랑 같이 날기 링크':'Fly-with-me link','어느 나라 산타인가요?':'Which country do you fly for?','내가 보내는 선물은 모두 이 나라 점수가 돼요':'Every gift you send scores for this country',
 '나라 검색':'Search countries','별똥별에 소원을 빌어요':'Make a wish on the shooting star','소원을 적어주세요':'Write your wish','취소':'Cancel','빌기':'Wish','이미지를 길게 눌러 저장할 수도 있어요':'You can also long-press the image to save it',
 '공유하기':'Share','저장':'Save','산타 국가 대항전':'Santa country battle','선물 받은 나라':'Gifts received','내 나라 바꾸기':'Change my country','소원 빌기':'Make a wish','북극해':'the Arctic Ocean','바다':'the ocean','산타 마을':"Santa's Village",
@@ -1016,7 +1032,7 @@ function makeSleigh(){
   // seat cushion
   const cu=new THREE.Mesh(boxG,green);cu.scale.set(1.0*s,.14*s,.7*s);cu.position.set(0,.84*s,.25*s);g.add(cu);
   // santa
-  const santa=new THREE.Group();santa.position.set(0,.9*s,.1*s);g.add(santa);
+  const santa=new THREE.Group();santa.name='seat';santa.position.set(0,.9*s,.1*s);g.add(santa);
   const torso=new THREE.Mesh(new THREE.SphereGeometry(.42*s,20,16),red);torso.scale.set(1,1.05,.88);torso.position.y=.38*s;santa.add(torso);
   const belt=new THREE.Mesh(new THREE.TorusGeometry(.4*s,.06*s,8,24),dark);belt.rotation.x=Math.PI/2;belt.position.y=.3*s;belt.scale.set(1,.88,1);santa.add(belt);{const bk=new THREE.Mesh(new THREE.BoxGeometry(.13*s,.1*s,.03*s),GOLD);bk.position.set(0,.3*s,-.355*s);santa.add(bk);}
   const fur=new THREE.Mesh(new THREE.TorusGeometry(.38*s,.09*s,8,24),cream);fur.rotation.x=Math.PI/2;fur.position.y=.02*s;fur.scale.set(1.08,.95,1);santa.add(fur);
@@ -1206,7 +1222,7 @@ function rideStep(dt){
   RIDE.hS+=(RIDE.h-RIDE.hS)*Math.min(1,dt*.6);const lift=smooth(1.6,7.5,RIDE.t);const prevH=RIDE.hNow;RIDE.hNow=THREE.MathUtils.lerp(.0045,RIDE.hS,lift);
   RIDE.climb=THREE.MathUtils.clamp((RIDE.hNow-prevH)/Math.max(dt,1e-4)*-6,-.35,.3);
   const go=smooth(.8,4.5,RIDE.t);
-  RIDE.steer=mode==='ride'?THREE.MathUtils.clamp((RIDE.keyR+RIDE.btnR-RIDE.keyL-RIDE.btnL)+RIDE.drag,-1,1):0;
+  RIDE.steer=mode==='ride'?THREE.MathUtils.clamp((RIDE.keyR+RIDE.btnR-RIDE.keyL-RIDE.btnL)+RIDE.drag+(JOY.on?JOY.x:0),-1,1):0;if(mode==='ride'&&JOY.on&&Math.abs(JOY.y)>.6){JOY.acc+=dt;if(JOY.acc>.55){JOY.acc=0;const nl=RIDE.lvl+(JOY.y<0?1:-1);if(nl!==RIDE.lvl&&nl>=0&&nl<SPEEDS.length){if(grounded()&&JOY.y<0)takeOff();else setLvl(nl);whisper(TR('속도')+' · '+TR(SPEEDS[RIDE.lvl].n));}}}else JOY.acc=.4;
   RIDE.turn+=(RIDE.steer-RIDE.turn)*Math.min(1,dt*2.2);
   RIDE.f.applyAxisAngle(RIDE.p,-RIDE.turn*.75*dt);
   const sp=SPEEDS[RIDE.lvl].v*THREE.MathUtils.lerp(.35,1,go)*go;
@@ -1393,7 +1409,7 @@ function roomSync(st){roomCounts={};roomMembers={};for(const [id,metas] of Objec
 var lastPlace='',placeT=0;
 function placeTick(dt){placeT-=dt;if(placeT>0)return;placeT=.5;const bar=$('placeBar');let html='',key='';
   if(mode==='ride'&&RIDE.p.distanceTo(PLAZA.c)<.12&&!curRoom){key='v'+JSON.stringify(roomCounts);
-    html=`<div class="pt">${L('북극 산타 마을 · 놀러 갈 곳을 골라요','Santa\'s Village · pick a place to visit')}</div>`+Object.entries(ROOMS).map(([k,v])=>`<button data-room="${k}">${L(v[0],v[1])}<small>${roomCounts[k]||0}/${ROOM_MAX}</small></button>`).join('');}
+    html=`<div class="pt">${L('북극 산타 마을','Santa\'s Village')}</div><button data-room="village">${L('썰매에서 내려 마을 걷기','Hop off and walk the village')}</button>`;}
   else{const S=nearStation();if(S){const here=[...peers.values()].filter(P=>P.ride&&P.p.distanceTo(S.n)<.07).length;key='s'+S.id+here;unlock('station');
     html=`<div class="pt">${L(S.ko,S.en)} · ${L(`지금 다른 산타 ${here}명`,`${here} other Santa${here===1?'':'s'} here`)}</div><button data-st="wave">${L('모두에게 인사','Wave to everyone')}</button><button data-st="rest">${L('잠깐 쉬기','Take a break')}</button><button data-st="link">${L('여기서 만나기 링크','Meet-here link')}</button>`;
     if(key!==lastPlace&&lastPlace.charAt(0)!=='s')whisper(L(S.ko+'에 도착했어요','Welcome to '+S.en));}}
@@ -1472,8 +1488,8 @@ function makeWalker(name,isMe){const g=new THREE.Group();const red=STD(0xa8100c,
   const arms=[];[-1,1].forEach(k=>{const am=new THREE.Group();am.position.set(k*.42,1.3,0);g.add(am);const a=new THREE.Mesh(new THREE.CylinderGeometry(.09,.08,.5,8),red);a.position.y=-.25;am.add(a);
     const cf=new THREE.Mesh(new THREE.TorusGeometry(.085,.03,6,12),cream);cf.rotation.x=Math.PI/2;cf.position.y=-.47;am.add(cf);const gl=new THREE.Mesh(new THREE.SphereGeometry(.08,8,6),blk);gl.position.y=-.55;am.add(gl);am.rotation.z=k*.15;arms.push(am);});
   const head=new THREE.Mesh(new THREE.SphereGeometry(.24,20,16),skin);head.position.y=1.68;g.add(head);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(.42,.42),new THREE.MeshBasicMaterial({map:isMe?FACE.tex:walkerFace(),transparent:true,depthWrite:false}));face.position.set(0,1.62,.22);g.add(face);
-  const beard=new THREE.Mesh(new THREE.SphereGeometry(.23,16,12),cream);beard.scale.set(1,1.15,.6);beard.position.set(0,1.45,.12);g.add(beard);
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(.42,.42),new THREE.MeshBasicMaterial({map:isMe?FACE.tex:walkerFace(),transparent:true,depthWrite:false}));face.position.set(0,1.63,.245);g.add(face);
+  const beard=new THREE.Mesh(new THREE.SphereGeometry(.23,16,12),cream);beard.scale.set(1,1.1,.55);beard.position.set(0,1.44,.13);g.add(beard);
   const hat=new THREE.Mesh(new THREE.ConeGeometry(.23,.55,16),red);hat.position.set(0,2.08,-.06);hat.rotation.x=-.45;g.add(hat);
   const brim=new THREE.Mesh(new THREE.TorusGeometry(.23,.06,8,20),cream);brim.rotation.x=Math.PI/2;brim.position.y=1.86;g.add(brim);
   const pom=new THREE.Mesh(new THREE.SphereGeometry(.08,10,8),cream);pom.position.set(0,2.22,-.32);g.add(pom);
@@ -1532,7 +1548,11 @@ function buildWalk(k){const S=new THREE.Scene();WALK.scene=S;WALK.npc=[];WALK.po
       g.position.set(rand(-6,6),0,rand(-4,6));g.rotation.y=rand(0,6.28);S.add(g);const lb=textSprite(L(NM[i][0],NM[i][1]));lb.position.y=2.6;lb.scale.set(.09,.022,1);g.add(lb);
       WALK.deer.push({g,d,legs:[],tgt:new THREE.Vector3(rand(-7,7),0,rand(-7,7)),wait:rand(0,4),ph:Math.random()*6,nm:NM[i]});d.traverse(x=>{if(x.userData&&x.userData.knee)WALK.deer[WALK.deer.length-1].legs.push(x);});});
     const sign=textSprite(L('순록 농장','Reindeer Farm'));sign.position.set(-5,6,-6);sign.scale.set(.16,.04,1);S.add(sign);}
-  WALK.me=makeWalker(L('나','me'),true);WALK.me.position.set(0,0,k==='wrap'?6.5:k==='farm'?5:8);WALK.me.rotation.y=Math.PI;S.add(WALK.me);WALK.others.clear();}
+  if(k==='village')buildVillageWalk(S);
+  WALK.me=makeWalker(L('나','me'),true);WALK.me.position.set(0,0,k==='wrap'?6.5:k==='farm'?5:8);WALK.me.rotation.y=Math.PI;
+  if(k==='village'){const d=WALK.door||[2.5,13.5];WALK.me.position.set(d[0],0,d[1]);WALK.me.rotation.y=Math.atan2(-d[0],-d[1]);}
+  WALK.camYaw=WALK.me.rotation.y;S.add(WALK.me);WALK.others.clear();
+  WALK.cam.position.set(WALK.me.position.x-Math.sin(WALK.camYaw)*5.2,3.1,WALK.me.position.z-Math.cos(WALK.camYaw)*5.2);}
 function makeElf(){const g=new THREE.Group();const gr=STD(0x2f8a4a,{roughness:.7}),sk=STD(0xf2c9a8),rd=STD(0xc8322a);
   const b=new THREE.Mesh(new THREE.ConeGeometry(.3,.75,12),gr);b.position.y=.55;g.add(b);const h=new THREE.Mesh(new THREE.SphereGeometry(.2,14,10),sk);h.position.y=1.08;g.add(h);
   const hat=new THREE.Mesh(new THREE.ConeGeometry(.2,.5,12),rd);hat.position.set(0,1.4,-.05);hat.rotation.x=-.3;g.add(hat);const pm=new THREE.Mesh(new THREE.SphereGeometry(.06,8,6),STD(0xffffff));pm.position.set(0,1.62,-.18);g.add(pm);
@@ -1551,10 +1571,13 @@ function wrapNext(){const b=WALK.wrapBox;if(!b)return false;const d=WALK.me.posi
     (function fly(){const k=Math.min(1,(performance.now()-t0)/900);b.position.lerpVectors(from,to,k);b.position.y+=Math.sin(k*Math.PI)*2;b.rotation.y+=.2;if(k<1)requestAnimationFrame(fly);else{resetWrapBox();}})();return true;}
   bells();return false;}
 var _cam=new THREE.Vector3(),_tgt=new THREE.Vector3();
-function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;const j=WALK.joy;let turn=0,fwd=0;
-  if(j){turn=THREE.MathUtils.clamp(j.dx/70,-1,1);fwd=THREE.MathUtils.clamp(-j.dy/70,-1,1);}
-  const K=WALK.keys;if(K.ArrowLeft||K.a)turn=-1;if(K.ArrowRight||K.d)turn=1;if(K.ArrowUp||K.w)fwd=1;if(K.ArrowDown||K.s)fwd=-.6;
-  me.rotation.y-=turn*2.2*dt;const sp=fwd*3.2;const dir=new THREE.Vector3(Math.sin(me.rotation.y),0,Math.cos(me.rotation.y));me.position.addScaledVector(dir,sp*dt);
+function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;let jx=0,jy=0;
+  if(JOY.on){jx=JOY.x;jy=-JOY.y;}const K=WALK.keys;if(K.ArrowLeft||K.a)jx=-1;if(K.ArrowRight||K.d)jx=1;if(K.ArrowUp||K.w)jy=1;if(K.ArrowDown||K.s)jy=-1;
+  const mag=Math.min(1,Math.hypot(jx,jy));let sp=0;
+  if(mag>.12){const cy=WALK.camYaw+(WALK.view===1?Math.PI:0);const fx=Math.sin(cy),fz=Math.cos(cy);const wx=fx*jy-fz*jx,wz=fz*jy+fx*jx;const want=Math.atan2(wx,wz);
+    me.rotation.y+=((want-me.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*10);sp=mag*3.4;me.position.x+=Math.sin(me.rotation.y)*sp*dt;me.position.z+=Math.cos(me.rotation.y)*sp*dt;
+    if(WALK.view!==1)WALK.camYaw+=((me.rotation.y-WALK.camYaw+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*1.6);}
+  if(WALK.room==='village')villageZones();
   const B=WALK.bounds;if(WALK.room==='wrap'){me.position.x=THREE.MathUtils.clamp(me.position.x,-B,B);me.position.z=THREE.MathUtils.clamp(me.position.z,-B,B);}else{const r=Math.hypot(me.position.x,me.position.z);if(r>B)me.position.multiplyScalar(B/r);}
   let y=0;if(WALK.room==='spa'){const r=Math.hypot(me.position.x,me.position.z);const inW=r<4.1;y=inW?-.95:0;if(inW&&!WALK.inWater){WALK.inWater=true;whisper(L('풍덩, 따끈해요','Splash, nice and warm'));unlock('spa');}if(!inW)WALK.inWater=false;}
   me.position.y+=(y-me.position.y)*Math.min(1,dt*6);animWalker(me,Math.abs(sp),dt);
@@ -1570,12 +1593,13 @@ function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;const j=WALK.joy
     if(D.wait<=0){if(to.length()<.3){D.wait=rand(2,6);D.tgt.set(rand(-7.5,7.5),0,rand(-7.5,7.5));}else{const a=Math.atan2(to.x,to.z);D.g.rotation.y+=((a-D.g.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);p.addScaledVector(to.normalize(),1.1*dt);mv=1;}}
     D.ph+=dt*(mv?7:1.5);D.legs.forEach((l,i)=>{l.rotation.x=Math.sin(D.ph+(i%2?0:Math.PI))*.4*mv;});}
   for(const P of WALK.poops)P.rotation.y+=dt;
-  _cam.set(me.position.x-Math.sin(me.rotation.y)*5.2,Math.max(me.position.y,0)+3.1,me.position.z-Math.cos(me.rotation.y)*5.2);WALK.cam.position.lerp(_cam,Math.min(1,dt*4));
-  _tgt.set(me.position.x,me.position.y+1.3,me.position.z);WALK.cam.lookAt(_tgt);WALK.cam.aspect=innerWidth/innerHeight;WALK.cam.updateProjectionMatrix();
+  {const yw=WALK.view===1?me.rotation.y+Math.PI:WALK.camYaw,dist=WALK.view===1?3.2:WALK.view===2?11:5.2,h=WALK.view===1?1.7:WALK.view===2?8:3.1;
+   _cam.set(me.position.x-Math.sin(yw)*dist,Math.max(me.position.y,0)+h,me.position.z-Math.cos(yw)*dist);WALK.cam.position.lerp(_cam,Math.min(1,dt*(WALK.view===1?6:4)));}
+  _tgt.set(me.position.x,me.position.y+(WALK.view===1?1.55:1.3),me.position.z);WALK.cam.lookAt(_tgt);WALK.cam.aspect=innerWidth/innerHeight;WALK.cam.updateProjectionMatrix();
   if(WALK.room==='farm'&&Math.random()<dt*.18&&WALK.poops.length<7){const D=pick(WALK.deer);const pp=new THREE.Group();for(let i=0;i<3;i++){const c=new THREE.Mesh(new THREE.TorusGeometry(.13-i*.035,.06,6,12),STD(0x5a3a1e,{roughness:.6}));c.rotation.x=Math.PI/2;c.position.y=.06+i*.08;pp.add(c);}
     pp.position.copy(D.g.position).add(new THREE.Vector3(rand(-.5,.5),0,rand(-.5,.5)));pp.position.y=0;WALK.scene.add(pp);WALK.poops.push(pp);}}
-function walkPtr(e,ph){if(ph===0){WALK.joy={x0:e.clientX,y0:e.clientY,dx:0,dy:0,moved:0};$('walkHint').style.opacity=0;return;}
-  if(ph===1){const j=WALK.joy;if(!j)return;j.dx=e.clientX-j.x0;j.dy=e.clientY-j.y0;j.moved=Math.max(j.moved,Math.hypot(j.dx,j.dy));return;}
+function walkPtr(e,ph){if(ph===0){WALK.joy={x0:e.clientX,y0:e.clientY,dx:0,dy:0,moved:0};return;}
+  if(ph===1){const j=WALK.joy;if(!j)return;const ddx=e.clientX-j.x0-j.dx;j.dx=e.clientX-j.x0;j.dy=e.clientY-j.y0;j.moved=Math.max(j.moved,Math.hypot(j.dx,j.dy));if(WALK.view!==1)WALK.camYaw-=ddx*.006;return;}
   const j=WALK.joy;WALK.joy=null;if(j&&j.moved<8){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,WALK.cam);
     const hp=WALK.poops.find(p=>ray.intersectObject(p,true).length);if(hp)return cleanPoop(hp);
     const hd=WALK.deer.find(D=>ray.intersectObject(D.g,true).length);if(hd)return feedNear(hd);}}
@@ -1610,6 +1634,84 @@ function walkPos(p){if(!p||p.room!==curRoom||p.id===myId||!WALK.scene)return;let
 function bubble(id,txt){const w=id===myId?WALK.me:(WALK.others.get(id)||{}).g;if(!w||!WALK.scene)return;const sp=textSprite(txt);sp.scale.set(.13,.0325,1);sp.position.y=2.95;w.add(sp);setTimeout(()=>w.remove(sp),2400);}
 function roomEvent(p){if(!p||p.room!==curRoom||p.id===myId||!EMO[p.a])return;bubble(p.id,L(EMO[p.a],EMO_EN[p.a]));if(p.a==='wrap')wrapCount++;}
 function farmPts(){farmScore++;if(farmScore>=5)unlock('farm');}
+
+// ================= JOYSTICK =================
+var JOY={on:false,x:0,y:0,acc:.4};
+(()=>{const el=$('joy'),kn=el.querySelector('.knob');let id=null;
+  const upd=e=>{const r=el.getBoundingClientRect();let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);const m=Math.hypot(dx,dy),R0=r.width/2-18;if(m>R0){dx*=R0/m;dy*=R0/m;}
+    kn.style.transform=`translate(${dx}px,${dy}px)`;JOY.x=dx/R0;JOY.y=dy/R0;};
+  el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();id=e.pointerId;el.setPointerCapture(id);JOY.on=true;el.classList.add('on');upd(e);$('walkHint').style.opacity=0;});
+  el.addEventListener('pointermove',e=>{if(e.pointerId===id)upd(e);});
+  const end=e=>{if(e.pointerId!==id)return;id=null;JOY.on=false;JOY.x=JOY.y=0;el.classList.remove('on');kn.style.transform='';};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);})();
+// ================= WALKABLE VILLAGE =================
+WALK.view=0;WALK.camYaw=0;WALK.door=null;
+var VZONES=[{k:'spa',x:-11,z:-4,r:2.6,ko:'산타 온천',en:'Santa Hot Spring'},{k:'wrap',x:11,z:-4,r:2.2,ko:'선물 포장 공방',en:'Wrapping Workshop'},{k:'farm',x:0,z:-15,r:2.4,ko:'순록 농장',en:'Reindeer Farm'}];
+function buildVillageWalk(S){S.background=new THREE.Color('#081428');S.fog=new THREE.Fog(0x081428,22,70);fill(S);WALK.bounds=26;
+  const gr=new THREE.Mesh(new THREE.CircleGeometry(80,64),STD(0xb4c2d4,{roughness:1}));gr.rotation.x=-Math.PI/2;S.add(gr);
+  const path=new THREE.Mesh(new THREE.RingGeometry(5.5,7,64),STD(0x9aa8b8,{roughness:1}));path.rotation.x=-Math.PI/2;path.position.y=.01;S.add(path);
+  // the big tree
+  const T=new THREE.Group();S.add(T);const gm=STD(0x24543a,{roughness:.85}),sn=STD(0xf4f8ff,{roughness:1});
+  [[3.4,4,2.2],[2.7,3.4,4.6],[2,2.8,6.6],[1.3,2.2,8.3]].forEach(([r,h,y])=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r,h,16),gm);c.position.y=y;T.add(c);const c2=new THREE.Mesh(new THREE.ConeGeometry(r*.88,h*.25,16),sn);c2.position.y=y+h*.38;T.add(c2);});
+  const tr=new THREE.Mesh(new THREE.CylinderGeometry(.45,.55,1.4,10),STD(0x5a3a24));tr.position.y=.7;T.add(tr);
+  const pts=[];for(let i=0;i<=200;i++){const k=i/200,y=.6+k*8.4,r=(3.5-k*3.1)*.98+.05,a=k*Math.PI*2*4.5;pts.push(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r));}
+  const cv=new THREE.CatmullRomCurve3(pts);T.add(new THREE.Mesh(new THREE.TubeGeometry(cv,400,.07,6),STD(0xf1c45c,{metalness:.9,roughness:.25,emissive:0x4a2a05})));
+  WALK.tl=[];for(let i=0;i<90;i++){const p=cv.getPoint(i/90);const g=glow(pick([0xff6b5b,0xffd36b,0x8fd4ff,0xff9ad5,0xb6ff9a]),.45,.95);g.position.copy(p).multiplyScalar(1.02);T.add(g);WALK.tl.push({g,ph:Math.random()*6,sp:rand(1.5,3.5)});}
+  for(let i=0;i<40;i++){const y=rand(1,8),a=rand(0,6.283),r=(3.5-(y-.6)/8.4*3.1)*.95;const b=new THREE.Mesh(new THREE.SphereGeometry(rand(.13,.2),12,10),STD(pick([0xc81e2a,0xe2b04a,0xd9dde6,0x2e5ab8]),{metalness:.85,roughness:.2}));b.position.set(Math.cos(a)*r,y,Math.sin(a)*r);T.add(b);}
+  const sh=new THREE.Shape();for(let i=0;i<10;i++){const rr=i%2?.32:.8,a=Math.PI/2+i*Math.PI/5;i?sh.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):sh.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}
+  const star=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.18,bevelEnabled:false}),new THREE.MeshBasicMaterial({color:0xffe08a}));star.position.set(0,9.8,0);T.add(star);WALK.star=star;const hl=glow(0xfff0b0,5,.6);hl.position.y=9.9;T.add(hl);
+  const pl=new THREE.PointLight(0xffd9a0,1.2,22,2);pl.position.set(0,5,0);S.add(pl);
+  for(let i=0;i<14;i++){const a=i/14*6.283,r=rand(2.3,3.2),s=rand(.35,.6);const b=new THREE.Mesh(boxG,STD(pick([0xc8463c,0x2f6e4f,0xe9c46a,0x3d5a98,0xe7a5b6])));b.scale.setScalar(s);b.position.set(Math.cos(a)*r,s/2,Math.sin(a)*r);b.rotation.y=rand(0,3);S.add(b);}
+  // cottages
+  for(let i=0;i<10;i++){const a=i/10*6.283+.3;if(Math.abs(Math.cos(a))<.15&&Math.sin(a)<0)continue;const x=Math.cos(a)*21,z=Math.sin(a)*21;const h=new THREE.Group();h.position.set(x,0,z);h.rotation.y=Math.atan2(-x,-z);S.add(h);
+    const b=new THREE.Mesh(boxG,STD(pick([0x9c4a3a,0x7a4b2e,0xb8342c,0x6e4a34])));b.scale.set(3.6,2.6,3);b.position.y=1.3;h.add(b);
+    const rf=new THREE.Mesh(new THREE.ConeGeometry(3.1,1.8,4),STD(0xf4f8ff,{roughness:1}));rf.rotation.y=Math.PI/4;rf.scale.set(1.2,1,1);rf.position.y=3.5;h.add(rf);
+    [[-.9,1.4],[.9,1.4]].forEach(([wx,wy])=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(.7,.7),new THREE.MeshBasicMaterial({color:0xffc66b}));w.position.set(wx,wy,1.51);h.add(w);const g=glow(0xffb35a,1,.6);g.position.set(wx,wy,1.7);h.add(g);});
+    const d=new THREE.Mesh(new THREE.PlaneGeometry(.8,1.4),STD(0x4a2c18));d.position.set(0,.7,1.51);h.add(d);}
+  for(let i=0;i<16;i++){const a=i/16*6.283;lantern(S,Math.cos(a)*8,Math.sin(a)*8);}
+  for(let i=0;i<18;i++){const a=i/18*6.283;pine(S,Math.cos(a)*rand(27,32),Math.sin(a)*rand(27,32),rand(1.5,2.3));}
+  // parked sleigh (empty seat)
+  {const m=sleigh.clone();const kill=[];m.traverse(o=>{if(o.isLight)kill.push(o);});kill.forEach(o=>o.parent.remove(o));m.visible=true;m.position.set(0,0,0);m.quaternion.identity();
+   const seat=m.getObjectByName('seat');if(seat)seat.visible=false;const z=m.getObjectByName('zzz');if(z)z.visible=false;const sc=1/.0055*.62;m.scale.setScalar(sc);m.position.set(-1.5,.05,15);m.rotation.y=Math.PI/2;S.add(m);WALK.parked=m;}
+  // hot spring preview
+  {const g=new THREE.Group();g.position.set(-11,0,-4);S.add(g);const w=new THREE.Mesh(new THREE.CircleGeometry(2.4,40),new THREE.MeshStandardMaterial({color:0x4fc0d6,emissive:0x0f5a6a,roughness:.15}));w.rotation.x=-Math.PI/2;w.position.y=.03;g.add(w);
+   for(let i=0;i<20;i++){const a=i/20*6.283;const r=new THREE.Mesh(new THREE.DodecahedronGeometry(rand(.3,.45)),STD(0x77726c,{roughness:1}));r.position.set(Math.cos(a)*2.6,.12,Math.sin(a)*2.6);r.scale.y=.6;g.add(r);}
+   for(let i=0;i<8;i++){const s=glow(0xffffff,rand(1.2,2),.16);s.position.set(rand(-1.5,1.5),rand(.3,2.5),rand(-1.5,1.5));s.userData.st=Math.random();g.add(s);WALK.npc.push({steam:s});}}
+  // workshop
+  {const g=new THREE.Group();g.position.set(11,0,-7);g.rotation.y=-.5;S.add(g);const b=new THREE.Mesh(boxG,STD(0x8c3b2e));b.scale.set(6,3.6,4.5);b.position.y=1.8;g.add(b);
+   const rf=new THREE.Mesh(new THREE.ConeGeometry(4.8,2.4,4),STD(0xf4f8ff,{roughness:1}));rf.rotation.y=Math.PI/4;rf.scale.set(1.25,1,1);rf.position.y=4.8;g.add(rf);
+   const rb=new THREE.Mesh(boxG,GOLD);rb.scale.set(6.05,.45,4.55);rb.position.y=2.9;g.add(rb);const bw=new THREE.Mesh(new THREE.TorusKnotGeometry(.7,.2,48,8),STD(0xd22b2b,{roughness:.4}));bw.position.y=6.3;g.add(bw);
+   const d=new THREE.Mesh(new THREE.PlaneGeometry(1.4,2.2),STD(0x4a2c18));d.position.set(0,1.1,2.26);g.add(d);[[-1.9,1.9],[1.9,1.9]].forEach(([wx,wy])=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xffc66b}));w.position.set(wx,wy,2.26);g.add(w);});}
+  // farm
+  {const g=new THREE.Group();g.position.set(0,0,-19);S.add(g);const fm=STD(0x7a5230,{roughness:.9});for(let i=0;i<28;i++){const a=i/28*6.283;if(Math.abs(a-Math.PI/2)<.3)continue;const p=new THREE.Mesh(new THREE.BoxGeometry(.14,1,.14),fm);p.position.set(Math.cos(a)*4.5,.5,Math.sin(a)*4.5);g.add(p);
+     const r=new THREE.Mesh(new THREE.BoxGeometry(.08,.1,1.1),fm);r.position.set(Math.cos(a+.11)*4.5,.8,Math.sin(a+.11)*4.5);r.rotation.y=-a-.11;g.add(r);}
+   const barn=new THREE.Mesh(new THREE.BoxGeometry(3,2.2,2.4),STD(0xa3392b));barn.position.set(-1.5,1.1,-1.8);g.add(barn);const br=new THREE.Mesh(new THREE.ConeGeometry(2.3,1.3,4),STD(0xf4f8ff));br.rotation.y=Math.PI/4;br.position.set(-1.5,2.85,-1.8);g.add(br);
+   sleigh.userData.deer.slice(0,2).forEach((o,i)=>{const d=o.d.clone();d.position.set(1.2+i*1.3,.62*.6,0.5-i);d.scale.setScalar(1/.0055*.85*.6);d.rotation.y=i?2:-1;g.add(d);});}
+  // entry zones
+  WALK.zones=VZONES.map(Z=>{const ring=new THREE.Mesh(new THREE.RingGeometry(Z.r-.12,Z.r,48),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.55}));ring.rotation.x=-Math.PI/2;ring.position.set(Z.x,.04,Z.z);S.add(ring);
+    const lb=textSprite(L(Z.ko,Z.en));lb.position.set(Z.x,Z.k==='spa'?3.2:Z.k==='farm'?4.2:4,Z.z);lb.scale.set(.15,.0375,1);S.add(lb);return {...Z,ring};});
+  const ac=document.createElement('canvas');ac.width=256;ac.height=64;const ag=ac.getContext('2d');const lg=ag.createLinearGradient(0,0,0,64);lg.addColorStop(0,'rgba(150,80,255,0)');lg.addColorStop(.6,'rgba(60,255,160,.5)');lg.addColorStop(1,'rgba(60,255,160,0)');ag.fillStyle=lg;ag.fillRect(0,0,256,64);
+  const au=new THREE.Mesh(new THREE.PlaneGeometry(160,34),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(ac),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,side:THREE.DoubleSide}));au.position.set(0,34,-70);S.add(au);WALK.aurora=au;}
+var zoneCool=0;
+function villageZones(){if(zoneCool>performance.now())return;const p=WALK.me.position;
+  for(const Z of WALK.zones||[]){Z.ring.material.opacity=.35+.3*Math.sin(WALK.t*3);if(Math.hypot(p.x-Z.x,p.z-Z.z)<Z.r){zoneCool=performance.now()+3000;WALK.door=[Z.x+(Z.x?-Math.sign(Z.x)*0:0),Z.z+Z.r+1.6];goRoom(Z.k);return;}}
+  if(WALK.tl)WALK.tl.forEach(L0=>L0.g.material.opacity=.45+.55*Math.max(0,Math.sin(WALK.t*L0.sp+L0.ph)));if(WALK.star)WALK.star.rotation.y+=.01;}
+function goRoom(k){if((roomCounts[k]||0)>=ROOM_MAX){toast(L('만원이에요','It\'s full'),L(`정원 ${ROOM_MAX}명이 모두 차 있어요`,`All ${ROOM_MAX} spots are taken`));return;}
+  const f=$('fade');f.classList.add('on');setTimeout(()=>{curRoom=k;WALK.room=k;setRoomPresence();buildWalk(k);walkUI();drawAvatars();f.classList.remove('on');
+    setTimeout(()=>toast(L(ROOMS[k][0],ROOMS[k][1]),k==='spa'?L('가운데 온천으로 걸어 들어가 보세요','Walk into the spring in the middle'):k==='wrap'?L('가운데 포장대에서 포장을 도와요','Help at the table in the middle'):L('순록을 눌러 당근을 주고 똥을 치워요','Tap reindeer to feed them, tap poop to clean')),400);},600);}
+function walkUI(){const k=WALK.room;$('walkTitle').textContent=k==='village'?L('북극 산타 마을','Santa\'s Village'):L(ROOMS[k][0],ROOMS[k][1]);
+  $('walkExit').textContent=k==='village'?L('썰매 타기','Back to the sleigh'):L('마을로 나가기','Back to the village');
+  const acts=k==='village'?[['hi','인사하기','Say hi']]:k==='spa'?[['splash','첨벙','Splash'],['sing','노래','Sing'],['towel','수건 올리기','Towel'],['ahh','아~ 좋다','Ahh']]:k==='wrap'?[['wrap','포장 돕기','Help wrap'],['cheer','엘프 응원','Cheer elves']]:[['feed','당근 주기','Feed'],['pet','쓰다듬기','Pet'],['cleanall','똥 치우기','Clean up']];
+  $('walkActs').innerHTML=acts.map(([a,ko,en])=>`<button data-a="${a}">${L(ko,en)}</button>`).join('');}
+EMO.hi='안녕하세요!';EMO_EN.hi='Hello!';
+function enterRoom(k){if(k!=='village')return goRoom(k);whisper(L('썰매에서 내려요','Hopping off the sleigh'));const f=$('fade');f.classList.add('on');
+  setTimeout(()=>{curRoom='village';WALK.room='village';WALK.door=null;setRoomPresence();setLvl(0);buildWalk('village');mode='walk';document.body.classList.add('walk');walkUI();$('walkHint').style.opacity=1;drawAvatars();f.classList.remove('on');zoneCool=performance.now()+1500;
+    setTimeout(()=>toast(L('북극 산타 마을','Santa\'s Village'),L('빛나는 원으로 걸어가면 들어갈 수 있어요','Walk into a glowing circle to go inside')),400);},600);}
+function exitRoom(){const f=$('fade');f.classList.add('on');
+  if(WALK.room&&WALK.room!=='village'){setTimeout(()=>{curRoom='village';WALK.room='village';setRoomPresence();buildWalk('village');walkUI();drawAvatars();f.classList.remove('on');zoneCool=performance.now()+2000;},600);return;}
+  setTimeout(()=>{curRoom='';WALK.room='';setRoomPresence();mode='ride';document.body.classList.remove('walk');lastPlace='';f.classList.remove('on');whisper(L('다시 썰매에 탔어요','Back on the sleigh'));},600);}
+$('walkExit').onclick=exitRoom;
+$('walkView').onclick=()=>{WALK.view=(WALK.view+1)%3;whisper([L('뒤에서 보기','Behind'),L('산타 얼굴 보기','Santa\'s face'),L('멀리서 보기','Wide')][WALK.view]);};
 // ================= BADGES =================
 var BADGES=[['first','🎁','첫 선물','First gift'],['hundred','💯','선물 100개','100 gifts'],['aurora','🌌','오로라 통과','Through the aurora'],['world','🌍','세계 일주 산타','World tour Santa'],
  ['low','🏠','지붕 위 산타','Rooftop flyer'],['formation','✈️','편대 비행','Formation flight'],['wave','👋','인사왕','Friendly wave'],['wish','🌠','별똥별 소원','Shooting-star wish'],['eve','🎄','이브의 산타','Christmas Eve Santa'],['spa','♨️','온천욕 산타','Hot-spring Santa'],['elf','🧝','엘프의 친구','Friend of the elves'],['farm','🦌','순록 돌보미','Reindeer keeper'],['station','🚉','정거장 여행자','Station hopper']];
