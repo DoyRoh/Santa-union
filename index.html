@@ -1506,7 +1506,7 @@ function pine(S,x,z,s){const g=new THREE.Group();g.position.set(x,0,z);const gm=
   [[1.2,1.6,1.2],[.95,1.3,2.1],[.65,1,2.85]].forEach(([r,h,y])=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r*s,h*s,10),gm);c.position.y=y*s;g.add(c);const c2=new THREE.Mesh(new THREE.ConeGeometry(r*s*.85,h*s*.3,10),sn);c2.position.y=(y+h*.3)*s;g.add(c2);});
   const tr=new THREE.Mesh(new THREE.CylinderGeometry(.15*s,.2*s,.7*s,6),STD(0x5a3a24));tr.position.y=.35*s;g.add(tr);S.add(g);}
 function lantern(S,x,z,c=0xffc27a){const p=new THREE.Mesh(new THREE.CylinderGeometry(.05,.07,1.6,6),STD(0x2b2b33));p.position.set(x,.8,z);S.add(p);const l=glow(c,1.1,.95);l.position.set(x,1.7,z);S.add(l);const pl=new THREE.PointLight(c,.8,6,2);pl.position.set(x,1.7,z);S.add(pl);}
-function buildWalk(k){const S=new THREE.Scene();WALK.scene=S;WALK.npc=[];WALK.poops=[];WALK.deer=[];WALK.wrapBox=null;WALK.bounds=9.5;
+function buildWalk(k){const S=new THREE.Scene();WALK.scene=S;WALK.dring=null;WALK.npc=[];WALK.poops=[];WALK.deer=[];WALK.wrapBox=null;WALK.bounds=9.5;
   WALK.cam=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.05,400);
   if(k==='spa'){S.background=new THREE.Color('#0a1530');S.fog=new THREE.Fog(0x0a1530,14,45);fill(S);
     const gr=new THREE.Mesh(new THREE.CircleGeometry(40,48),STD(0xaebccd,{roughness:1}));gr.rotation.x=-Math.PI/2;S.add(gr);
@@ -1709,11 +1709,14 @@ var ctxT=0,ctxKey='';
 function ctxActs(){const k=WALK.room,me=WALK.me;if(!me)return [[],''];
   if(k==='farm'){const D=nearDeer(3.4);let pp=null;for(const p of WALK.poops)if(p.position.distanceTo(me.position)<3)pp=p;
     const a=[['call','순록 부르기','Call a reindeer']];if(D)a.unshift(['feed',`${L(D.nm[0],D.nm[1])}에게 당근 주기`,`Feed ${D.nm[1]}`],['pet','쓰다듬기','Pet']);if(pp)a.unshift(['cleanall','똥 치우기','Clean up']);
-    return [a,D||pp?'':L('순록이나 똥 가까이 걸어가면 버튼이 생겨요','Walk up to a reindeer or poop to interact')];}
+    return [a,D||pp?'':L('노란 원이 있는 순록 옆으로 걸어가면 초록색으로 바뀌며 당근을 줄 수 있어요','Walk to the reindeer with the yellow ring — it turns green when you can feed it')];}
   if(k==='wrap'){const near=me.position.distanceTo(new THREE.Vector3(0,0,-1))<2.8;return [near?[['wrap','포장 돕기','Help wrap'],['cheer','엘프 응원','Cheer elves']]:[['cheer','엘프 응원','Cheer elves']],near?'':L('가운데 빛나는 원으로 걸어가요','Walk to the glowing circle in the middle')];}
   if(k==='spa')return [[['splash','첨벙','Splash'],['sing','노래','Sing'],['towel','수건 올리기','Towel'],['ahh','아~ 좋다','Ahh']],WALK.inWater?'':L('가운데 온천으로 걸어 들어가요','Walk into the spring')];
   return [[['hi','인사하기','Say hi']],L('빛나는 원으로 걸어가면 들어갈 수 있어요','Walk into a glowing circle to go inside')];}
-function ctxTick(dt){ctxT-=dt;if(ctxT>0)return;ctxT=.25;const [a,h]=ctxActs();const key=JSON.stringify(a)+h+LANG;if(key===ctxKey)return;ctxKey=key;
+function deerRing(){if(WALK.room!=='farm'||!WALK.scene)return;if(!WALK.dring){const r=new THREE.Mesh(new THREE.RingGeometry(1.1,1.3,40),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.8,depthWrite:false}));r.rotation.x=-Math.PI/2;WALK.scene.add(r);WALK.dring=r;}
+  let b=null,bd=1e9;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}const r=WALK.dring;if(!b){r.visible=false;return;}
+  r.visible=true;r.position.set(b.g.position.x,.05,b.g.position.z);const near=bd<3.4;r.material.color.set(near?0x8fe08a:0xffd27a);r.material.opacity=near?.95:.45+.35*Math.sin(WALK.t*4);}
+function ctxTick(dt){deerRing();ctxT-=dt;if(ctxT>0)return;ctxT=.25;const [a,h]=ctxActs();const key=JSON.stringify(a)+h+LANG;if(key===ctxKey)return;ctxKey=key;
   $('walkActs').innerHTML=a.map(([x,ko,en])=>`<button data-a="${x}">${L(ko,en)}</button>`).join('');const wh=$('walkHint');wh.textContent=h;wh.style.opacity=h?1:0;}
 function walkUI(){ctxKey='';const k=WALK.room;$('walkTitle').textContent=k==='village'?L('북극 산타 마을','Santa\'s Village'):L(ROOMS[k][0],ROOMS[k][1]);
   $('walkExit').textContent=k==='village'?L('썰매 타기','Back to the sleigh'):L('마을로 나가기','Back to the village');
