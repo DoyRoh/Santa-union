@@ -128,6 +128,8 @@
   .corner{position:fixed;top:max(16px,env(safe-area-inset-top));font-size:13px;padding:8px 13px;z-index:5;color:var(--dim)}
   .exit{left:max(12px,env(safe-area-inset-left))}
   .icon{width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .lang{right:calc(max(12px,env(safe-area-inset-right)) + 48px);width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.5px;color:var(--dim)}
+  body.ride .lang{display:none}
   .zin{display:none!important}
   body.flying:not(.ride) #exitBtn{display:flex!important}
   body.flying:not(.ride) #exitBtn .zin{display:block!important}
@@ -235,6 +237,7 @@
 <div id="fade"></div>
 <button class="btn corner view ride-only icon" id="viewBtn" title="시점 바꾸기" aria-label="시점 바꾸기"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 11.5C6.5 6.5 10.5 4 15.5 5.5l2.5 4"/><circle cx="18.6" cy="10.6" r="1.2"/><path d="M5 11.5h12.5"/><path d="M6.5 11.5v1.8a5.5 5.5 0 0 0 11 0v-1.8"/><path d="M9.6 14.2h.01"/><path d="M14.4 14.2h.01"/><path d="M10.2 16.6c1.1.7 2.5.7 3.6 0"/></svg></button>
 <button class="btn corner rankb icon" id="rankBtn" title="선물 많이 받은 나라" aria-label="선물 많이 받은 나라"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4.5h8v4.5a4 4 0 0 1-8 0z"/><path d="M8 6.5H5.5a2.8 2.8 0 0 0 2.8 3.4"/><path d="M16 6.5h2.5a2.8 2.8 0 0 1-2.8 3.4"/><path d="M12 13v3.5"/><path d="M8.5 19.5h7"/><path d="M10 16.5h4v3h-4z"/></svg></button>
+<button class="btn corner lang" id="langBtn" aria-label="Language">EN</button>
 <button class="btn corner music on" id="musicBtn" title="음악 켜기/끄기" aria-label="음악"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.5V6.5l10-2v11"/><circle cx="6.8" cy="17.5" r="2.2"/><circle cx="16.8" cy="15.5" r="2.2"/></svg></button>
 
 <div class="feed" id="feed"></div>
@@ -251,7 +254,45 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const DEG=Math.PI/180;
 const rdir=()=>{const u=Math.random()*2-1,a=Math.random()*6.2832,s=Math.sqrt(1-u*u);return new THREE.Vector3(s*Math.cos(a),u,s*Math.sin(a));};
 const $=id=>document.getElementById(id);
-const fmt=n=>n.toLocaleString('ko-KR');
+const fmt=n=>n.toLocaleString(LANG==='en'?'en-US':'ko-KR');
+let LANG=(()=>{try{const s=localStorage.getItem('santa.lang');if(s)return s;}catch(e){}return /^ko/i.test(navigator.language||'')?'ko':'en';})();
+const D={
+'산타 연합':'Santa Union','오늘 밤, 우리는 모두 산타':'Tonight, we are all Santa','밤하늘을 준비하는 중…':'Preparing the night sky…',
+'지금 함께 있는 산타':'Santas flying now','모두의 선물':'Gifts delivered','지금':'Over','상공':'','산타':'Santas','당신은':'You are','· 보낸 선물':'· gifts sent',
+'지구를 돌려 둘러보세요. 누르면 어디인지 알려줘요.':'Spin the globe to look around. Tap to see where it is.','선물은':'Gifts drop','썰매를 타고':'from your sleigh','내려보낼 수 있어요.':'— take off!',
+'🛷 출발하기':'🛷 Take off','출발':'Go','높이':'Altitude','속도':'Speed','선물을 많이 받은 나라':'Most gifted countries',
+'북극 산타 마을로 돌아갈까요?':"Fly back to Santa's Village?",'지금 날고 있는 곳을 떠나 마을 광장으로 가요':'You will leave your spot and land in the village square',
+'계속 날기':'Keep flying','돌아가기':'Go back','닫기':'Close','음악':'Music','음악 켜기/끄기':'Music on/off','지구 보기':'Zoom out','북극 산타 마을로':"Back to Santa's Village",
+'시점 바꾸기':'Change view','선물 많이 받은 나라':'Most gifted countries','선물 내려보내기':'Drop a gift','왼쪽':'Left','오른쪽':'Right','낮게':'Lower','높게':'Higher','느리게':'Slower','빠르게':'Faster',
+'← → 방향 · ↑ ↓ 속도 · W S 높이 · V 시점 · 스페이스 선물 · 화면 클릭(H) 버튼 숨기기':'← → steer · ↑ ↓ speed · W S altitude · V view · Space gift · click empty sky (H) hide buttons',
+'잠시 멈춤':'Paused','눈송이처럼':'Like a snowflake','산책하듯':'Strolling','여유롭게':'Cruising','부지런히':'Busy','이브 마감 직전':'Christmas Eve rush',
+'지붕 바로 위':'Over the rooftops','낮은 하늘':'Low sky','구름 위로':'Above the clouds','별 가까이':'Near the stars',
+'🎥 뒤에서 보기':'🎥 Behind','🎥 앞에서 보기':'🎥 Front','🎥 옆에서 보기':'🎥 Side','🎥 산타 얼굴 보기':"🎥 Santa's face",
+'고요한 밤 거룩한 밤':'Silent Night','징글벨':'Jingle Bells','위 위시 유 어 메리 크리스마스':'We Wish You a Merry Christmas','기쁘다 구주 오셨네':'Joy to the World','노엘 (The First Noel)':'The First Noel','덱 더 홀':'Deck the Halls',
+'화면을 누르면 버튼이 다시 보여요':'Tap the screen to bring the buttons back','출발! 루돌프가 달리기 시작해요':'Off we go! Rudolph is running',
+'북극 산타 마을로 돌아왔어요':"Back at Santa's Village",'‹ › 로 방향을 정하고 출발을 눌러요':'Steer with ‹ › then tap Go','북극 산타 마을':"Santa's Village",
+'선물이 너무 빨라요. 루돌프가 잠깐 숨 고르는 중':'Too fast! Rudolph needs a breather','선물은 썰매를 타고 내려보낼 수 있어요 🛷':'Take off on your sleigh to drop gifts 🛷',
+'산타 마을로 돌아왔어요 🎅':"Back home at Santa's Village 🎅",'자기 집에 선물 주는 산타…':'A Santa gifting his own house…','🛷 내 썰매':'🛷 My sleigh',
+'<b>연결됐어요</b> · 지금 접속한 산타들과 같은 하늘을 날아요':'<b>Connected</b> · you are sharing the sky with every Santa online',
+'고래가 받았어요 🐋':'A whale got it 🐋','바다 깊이 천천히 가라앉는 중':'Slowly sinking to the deep','물고기들이 받았어요 🐟':'The fish got it 🐟','포장지는 해파리가 가져갔대요':'A jellyfish kept the wrapping paper',
+'문어가 받았어요 🐙':'An octopus got it 🐙','다리 여덟 개로 조심조심 여는 중':'Opening it carefully with eight arms','거북이가 받았어요 🐢':'A turtle got it 🐢','다 열어보려면 백 년쯤 걸린대요':'It will take about a hundred years to open',
+'돌고래가 받았어요 🐬':'A dolphin got it 🐬','신나서 세 번 뛰어올랐어요':'It jumped three times for joy','인어가 받았어요 🧜':'A mermaid got it 🧜','답장은 유리병에 넣어 보낸대요':'She will reply in a bottle',
+'등대지기가 건졌어요 🗼':'The lighthouse keeper caught it 🗼','오늘 밤은 외롭지 않겠네요':"He won't be lonely tonight",
+'대한민국에 도착했어요 🇰🇷':'Delivered to South Korea 🇰🇷','어느 집 굴뚝으로 쏙 들어갔어요':'Straight down a chimney','펭귄이 받았어요 🐧':'A penguin got it 🐧','남극에도 크리스마스는 와요':'Christmas comes to Antarctica too',
+'그린란드에 도착 ❄️':'Delivered to Greenland ❄️','산타 마을 이웃이라 배송비 무료':"Free shipping — Santa's neighbors",'핀란드에 도착 🦌':'Delivered to Finland 🦌','순록들이 반갑게 맞아줬어요':'The reindeer said hi',
+'일본에 도착했어요':'Delivered to Japan','이웃 나라에도 따뜻한 밤':'A warm night for the neighbors','러시아에 도착했어요':'Delivered to Russia','너무 넓어서 아직 배달 중이에요':'So big it is still being delivered',
+'산타 #':'Santa #','북극해':'the Arctic Ocean','바다':'the ocean','산타 마을':"Santa's Village",
+'에펠탑':'the Eiffel Tower','만리장성':'the Great Wall','도쿄타워':'Tokyo Tower','남산타워':'N Seoul Tower','자유의 여신상':'the Statue of Liberty','빅벤':'Big Ben','피라미드':'the Pyramids','타지마할':'the Taj Mahal','오페라 하우스':'the Sydney Opera House','구세주 그리스도상':'Christ the Redeemer'
+};
+const TR=s=>LANG==='en'&&s!=null&&D[s]!=null?D[s]:s;
+let KO2EN=null;const CN=k=>{if(LANG!=='en')return k;if(D[k]!=null)return D[k];if(!KO2EN){KO2EN={};COUNTRIES.forEach(c=>KO2EN[c.n]=c.e);}return KO2EN[k]||k;};
+const NK=n=>LANG==='en'?String(n).replace('산타 #','Santa #'):n;
+const I18N_NODES=[];
+function i18nCollect(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){const s=n.nodeValue.trim();if(s&&D[s]!=null&&!n.parentElement.closest('script'))I18N_NODES.push([n,n.nodeValue,s]);}
+  document.querySelectorAll('[title],[aria-label]').forEach(el=>['title','aria-label'].forEach(a=>{const v=el.getAttribute(a);if(v&&D[v]!=null)I18N_NODES.push([el,v,v,a]);}));}
+function i18nApply(){for(const [n,orig,key,attr] of I18N_NODES){const val=LANG==='en'?orig.replace(key,D[key]):orig;if(attr)n.setAttribute(attr,val);else n.nodeValue=val;}
+  document.documentElement.lang=LANG;document.title=LANG==='en'?'Santa Union — fly the world with every Santa online':'산타 연합 — 지구 어디든 선물 떨어뜨리기';
+  const b=document.getElementById('langBtn');if(b)b.textContent=LANG==='en'?'한':'EN';}
 const smooth=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
 
 // ---------- countries ----------
@@ -293,9 +334,11 @@ const T={day:tex('earth-day.jpg'),night:tex('earth-night.jpg'),spec:tex('earth-s
 Object.values(T).forEach(t=>t.anisotropy=renderer.capabilities.getMaxAnisotropy());
 let zenT=0;function toggleZen(force){const on=force!=null?force:!document.body.classList.contains('zen');document.body.classList.toggle('zen',on);if(on)whisper('화면을 누르면 버튼이 다시 보여요');}
 let readyDone=false;
-function ready(){if(readyDone)return;readyDone=true;const v=$('veil');v.querySelector('.s').innerHTML='화면을 눌러 밤하늘로 들어가요 <span style="color:var(--gold)">♪</span>';v.classList.add('tap');
-  const go=()=>{v.classList.add('gone');try{audioInit();AC.resume&&AC.resume();if(musicWanted&&!musicOn){musicOn=true;$('musicBtn').classList.add('on');playSong();}}catch(e){}};
-  v.addEventListener('pointerdown',go,{once:true});addEventListener('keydown',function k(){if(!v.classList.contains('gone'))go();removeEventListener('keydown',k);});}
+function startMusic(){try{audioInit();const go=()=>{if(AC.state==='running'&&musicWanted&&!musicOn){musicOn=true;$('musicBtn').classList.add('on');playSong();}};
+  if(AC.resume)AC.resume().then(go).catch(()=>{});else go();}catch(e){}}
+function ready(){if(readyDone)return;readyDone=true;$('veil').classList.add('gone');startMusic();
+  const kick=()=>{startMusic();if(musicOn){removeEventListener('pointerdown',kick,true);removeEventListener('keydown',kick,true);}};
+  addEventListener('pointerdown',kick,true);addEventListener('keydown',kick,true);}
 setTimeout(ready,9000);
 
 // faint borders texture
@@ -356,7 +399,7 @@ function makeAurora(plon,plat,rad){const pole=ll2v(plon,plat).normalize();let ax
   const e1=new THREE.Vector3().crossVectors(pole,ax).normalize(),e2=ax;const N=260;const pos=[],uv=[],idx=[];
   for(let i=0;i<=N;i++){const a=i/N*Math.PI*2;const rr=(rad+Math.sin(a*3)*2.2+Math.sin(a*7+1)*1.1)*DEG;
     const d=pole.clone().multiplyScalar(Math.cos(rr)).add(e1.clone().multiplyScalar(Math.sin(rr)*Math.cos(a))).add(e2.clone().multiplyScalar(Math.sin(rr)*Math.sin(a))).normalize();
-    const lo=d.clone().multiplyScalar(R*1.004),hi=d.clone().multiplyScalar(R*1.05);pos.push(lo.x,lo.y,lo.z,hi.x,hi.y,hi.z);uv.push(i/N,0,i/N,1);
+    const lo=d.clone().multiplyScalar(R*1.004),hi=d.clone().multiplyScalar(R*1.08);pos.push(lo.x,lo.y,lo.z,hi.x,hi.y,hi.z);uv.push(i/N,0,i/N,1);
     if(i<N){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);
   const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{time:{value:0},sunDir:{value:SUN}},
@@ -366,8 +409,8 @@ function makeAurora(plon,plat,rad){const pole=ll2v(plon,plat).normalize();let ax
       void main(){float x=vUv.x*90.;float rays=n(x*3.+time*.6)*.6+n(x*11.-time*1.3)*.4;float band=n(x*.35+time*.12);
         float y=vUv.y;float prof=smoothstep(0.,.12,y)*pow(1.-y,1.6);
         vec3 col=mix(vec3(.15,1.,.55),vec3(.55,.3,1.),smoothstep(.35,1.,y));
-        float night=smoothstep(.05,-.25,dot(vW,sunDir));
-        float a=prof*(.25+.75*rays)*(.35+.65*band)*night*1.5;gl_FragColor=vec4(col*a,a);}`});
+        float night=.15+.85*smoothstep(.2,-.2,dot(vW,sunDir));
+        float a=prof*(.25+.75*rays)*(.35+.65*band)*night*2.8;gl_FragColor=vec4(col*a,a);}`});
   const mesh=new THREE.Mesh(g,m);mesh.renderOrder=3;globe.add(mesh);AURORA.push(m);}
 // ---- shooting stars ----
 const METEORS=[];let meteorT=rand(3,6);
@@ -446,7 +489,7 @@ const glowT=(()=>{const c=document.createElement('canvas');c.width=c.height=64;c
   gr.addColorStop(0,'rgba(255,245,215,1)');gr.addColorStop(.25,'rgba(255,205,120,.7)');gr.addColorStop(1,'rgba(255,190,90,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);})();
 const glow=(color,scale,op=1)=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:op}));s.scale.setScalar(scale);return s;};
 
-makeAurora(-72.7,80.7,21);makeAurora(107.3,-80.7,21);
+makeAurora(-72.7,80.7,21);makeAurora(-72.7,80.7,16.5);makeAurora(-72.7,80.7,25.5);makeAurora(107.3,-80.7,21);makeAurora(107.3,-80.7,17);
 // ---------- materials ----------
 const STD=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.6,metalness:0,...o});
 const GOLD=STD(0xe9b85a,{metalness:.75,roughness:.28,emissive:0x3a2208});
@@ -534,6 +577,66 @@ const village=new THREE.Group();village.position.set(0,R,0);globe.add(village);
  for(let i=0;i<10;i++){const a=i/10*6.28;const g=glow(0xffc27a,.7*u,.9);g.position.set(Math.cos(a)*10*u,1.2*u,Math.sin(a)*10*u);village.add(g);}
 }
 
+// ---------- landmarks ----------
+const LANDMARKS=[];
+function plant(lon,lat,g,name){const n=ll2v(lon,lat).normalize();g.position.copy(n).multiplyScalar(R*1.0002);g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),n);globe.add(g);
+  const gl=glow(0xffd9a0,.02,.55);gl.position.copy(n).multiplyScalar(R*1.003);globe.add(gl);LANDMARKS.push({n,name,g,gl});}
+function nearLandmark(){let best=null,bd=.022;for(const L of LANDMARKS){const d=RIDE.p.distanceTo(L.n);if(d<bd){bd=d;best=L.name;}}return best;}
+{const H=.009;const M=(c,o={})=>STD(c,o);const add=(g,geo,mat,x,y,z,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);g.add(m);return m;};
+ const lamp=(g,c,s,x,y,z)=>{const l=glow(c,s,.95);l.position.set(x,y,z);g.add(l);};
+ // Eiffel Tower
+ {const g=new THREE.Group(),m=M(0x9a7a52,{metalness:.6,roughness:.4,emissive:0x3a2408,wireframe:true}),s=M(0x8a6a44,{metalness:.5,roughness:.5});
+  add(g,new THREE.CylinderGeometry(H*.13,H*.34,H*.32,4,3,true),m,0,H*.16,0,0,Math.PI/4);add(g,new THREE.CylinderGeometry(H*.07,H*.13,H*.32,4,3,true),m,0,H*.48,0,0,Math.PI/4);
+  add(g,new THREE.CylinderGeometry(H*.015,H*.07,H*.36,4,3,true),m,0,H*.82,0,0,Math.PI/4);
+  [.32,.64].forEach(y=>add(g,new THREE.BoxGeometry(H*(y<.5?.3:.17),H*.025,H*(y<.5?.3:.17)),s,0,H*y,0,0,Math.PI/4));
+  for(let i=0;i<18;i++){const y=rand(.05,.98);const r=(y<.32?.34-(y/.32)*.21:y<.64?.13-(y-.32)/.32*.06:.07-(y-.64)/.36*.055)*H*.7;const a=rand(0,6.28);lamp(g,0xffd27a,H*.06,Math.cos(a)*r,y*H,Math.sin(a)*r);}
+  lamp(g,0xfff2c0,H*.14,0,H,0);plant(2.29,48.86,g,'에펠탑');}
+ // Tokyo Tower
+ {const g=new THREE.Group(),r=M(0xd4321f,{roughness:.45}),w=M(0xf2efe8,{roughness:.6});
+  [[.0,.2,.3,.2,r],[.2,.38,.2,.13,w],[.38,.56,.13,.08,r],[.56,.72,.08,.045,w],[.72,.86,.045,.02,r],[.86,1,.02,.006,w]].forEach(([a,b,r0,r1,mt])=>add(g,new THREE.CylinderGeometry(H*r1,H*r0,H*(b-a),4),mt,0,H*(a+b)/2,0,0,Math.PI/4));
+  add(g,new THREE.BoxGeometry(H*.18,H*.05,H*.18),w,0,H*.38,0,0,Math.PI/4);add(g,new THREE.BoxGeometry(H*.09,H*.03,H*.09),w,0,H*.72,0,0,Math.PI/4);
+  lamp(g,0xffa060,H*.12,0,H*.38,0);lamp(g,0xff7050,H*.1,0,H,0);plant(139.75,35.66,g,'도쿄타워');}
+ // N Seoul Tower
+ {const g=new THREE.Group();add(g,new THREE.SphereGeometry(H*.28,16,10,0,Math.PI*2,0,Math.PI/2),M(0x2f5a3a,{roughness:.9}),0,0,0).scale.y=.55;
+  add(g,new THREE.CylinderGeometry(H*.03,H*.045,H*.62,12),M(0xeeeae2),0,H*.45,0);add(g,new THREE.CylinderGeometry(H*.1,H*.07,H*.07,16),M(0xdcd8cf),0,H*.72,0);
+  add(g,new THREE.CylinderGeometry(H*.006,H*.012,H*.3,6),M(0xffffff),0,H*.92,0);lamp(g,0x9fd0ff,H*.12,0,H*.72,0);lamp(g,0xff5a5a,H*.06,0,H*1.07,0);plant(126.988,37.551,g,'남산타워');}
+ // Statue of Liberty
+ {const g=new THREE.Group(),gr=M(0x6fae9c,{roughness:.55}),st=M(0xb8ad94);
+  add(g,new THREE.BoxGeometry(H*.22,H*.32,H*.22),st,0,H*.16,0);add(g,new THREE.ConeGeometry(H*.09,H*.42,10),gr,0,H*.53,0);add(g,new THREE.SphereGeometry(H*.045,10,8),gr,0,H*.78,0);
+  add(g,new THREE.ConeGeometry(H*.05,H*.05,7,1,true),gr,0,H*.83,0);add(g,new THREE.CylinderGeometry(H*.015,H*.018,H*.24,6),gr,H*.07,H*.82,0,0,0,-.25);
+  lamp(g,0xffc65a,H*.14,H*.1,H*.96,0);plant(-74.045,40.689,g,'자유의 여신상');}
+ // Big Ben
+ {const g=new THREE.Group(),sd=M(0xc9a96e,{roughness:.7});add(g,new THREE.BoxGeometry(H*.12,H*.62,H*.12),sd,0,H*.31,0);add(g,new THREE.BoxGeometry(H*.15,H*.14,H*.15),sd,0,H*.66,0);
+  add(g,new THREE.ConeGeometry(H*.1,H*.26,4),M(0x3c4a55),0,H*.86,0,0,Math.PI/4);
+  [[0,0,1],[0,0,-1],[1,0,0],[-1,0,0]].forEach(([x,,z])=>{const f=add(g,new THREE.CircleGeometry(H*.05,20),new THREE.MeshBasicMaterial({color:0xfff2c8}),x*H*.077,H*.66,z*H*.077);f.lookAt(x*H,H*.66,z*H);});
+  lamp(g,0xffe6a8,H*.18,0,H*.66,0);plant(-0.1246,51.5007,g,'빅벤');}
+ // Pyramids
+ {const g=new THREE.Group(),sa=M(0xd9b77a,{roughness:.95});[[0,0,1],[.32,.18,.85],[.55,.4,.5]].forEach(([x,z,s])=>add(g,new THREE.ConeGeometry(H*.42*s,H*.5*s,4),sa,x*H,H*.25*s,z*H,0,Math.PI/4));
+  lamp(g,0xffd59a,H*.25,0,H*.3,0);plant(31.134,29.979,g,'피라미드');}
+ // Taj Mahal
+ {const g=new THREE.Group(),wm=M(0xf6f2ea,{roughness:.5});add(g,new THREE.BoxGeometry(H*.55,H*.06,H*.55),wm,0,H*.03,0);add(g,new THREE.BoxGeometry(H*.3,H*.22,H*.3),wm,0,H*.17,0);
+  const dm=add(g,new THREE.SphereGeometry(H*.12,16,12),wm,0,H*.34,0);dm.scale.y=1.25;add(g,new THREE.ConeGeometry(H*.02,H*.08,8),M(0xd9b24a,{metalness:.7}),0,H*.5,0);
+  [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([x,z])=>{add(g,new THREE.CylinderGeometry(H*.018,H*.022,H*.4,8),wm,x*H*.24,H*.2,z*H*.24);add(g,new THREE.SphereGeometry(H*.03,8,6),wm,x*H*.24,H*.41,z*H*.24);});
+  lamp(g,0xfff0d8,H*.2,0,H*.3,0);plant(78.042,27.175,g,'타지마할');}
+ // Sydney Opera House
+ {const g=new THREE.Group(),wm=M(0xf4f1ea,{roughness:.4});add(g,new THREE.BoxGeometry(H*.6,H*.06,H*.3),M(0xb59e83),0,H*.03,0);
+  [[-.18,.28],[0,.24],[.16,.2]].forEach(([x,s])=>{[1,-1].forEach(k=>{const sh=add(g,new THREE.SphereGeometry(H*s,12,8,0,Math.PI,0,Math.PI/2),wm,x*H,H*.06,0,-Math.PI/2,0,k>0?-.35:.35);sh.scale.set(.6,1.2,1);});});
+  lamp(g,0xffe2b8,H*.2,0,H*.2,0);plant(151.215,-33.857,g,'오페라 하우스');}
+ // Christ the Redeemer
+ {const g=new THREE.Group();add(g,new THREE.ConeGeometry(H*.3,H*.5,10),M(0x3d5a3a,{roughness:.9}),0,H*.25,0);const wm=M(0xf2efe6);
+  add(g,new THREE.CylinderGeometry(H*.025,H*.04,H*.26,8),wm,0,H*.62,0);add(g,new THREE.BoxGeometry(H*.36,H*.035,H*.035),wm,0,H*.7,0);add(g,new THREE.SphereGeometry(H*.025,8,6),wm,0,H*.78,0);
+  lamp(g,0xfff4d8,H*.22,0,H*.65,0);plant(-43.2105,-22.9519,g,'구세주 그리스도상');}
+ // Great Wall: a winding wall over the ridges north of Beijing
+ {const pts=[];for(let i=0;i<=40;i++){const k=i/40;pts.push([115.6+k*3.2,40.25+Math.sin(k*9)*.18+Math.sin(k*23)*.05]);}
+  const wl=M(0xa8987a,{roughness:.9}),tw=M(0x9a8a6e,{roughness:.9});const g=new THREE.Group();
+  for(let i=0;i<pts.length-1;i++){const a=ll2v(pts[i][0],pts[i][1]).normalize(),b=ll2v(pts[i+1][0],pts[i+1][1]).normalize();const mid=a.clone().add(b).normalize();const len=a.distanceTo(b);
+    const m=new THREE.Mesh(new THREE.BoxGeometry(.0009,.0011,len*1.05),wl);m.position.copy(mid).multiplyScalar(R*1.0006);m.quaternion.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(),b.clone().sub(a),mid));
+    m.up.copy(mid);m.lookAt(b.clone().multiplyScalar(R*1.0006));globe.add(m);
+    if(i%4===0){const t=new THREE.Mesh(new THREE.BoxGeometry(.0018,.0024,.0018),tw);t.position.copy(a).multiplyScalar(R*1.0012);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),a);globe.add(t);
+      const l=glow(0xffc070,.0016,.9);l.position.copy(a).multiplyScalar(R*1.0028);globe.add(l);}}
+  const c=ll2v(117.2,40.35).normalize();const gl=glow(0xffd9a0,.02,.55);gl.position.copy(c).multiplyScalar(R*1.003);globe.add(gl);LANDMARKS.push({n:c,name:'만리장성',gl});}
+}
+let lmWhisper='';
 // ---------- gifts ----------
 const PAL=[[0xc8463c,0xf0d79a],[0x2f6e4f,0xe9c46a],[0xe9c46a,0xb5413a],[0x3d5a98,0xf3e6c8],[0xe7a5b6,0xfdf3e3],[0x7a5aa6,0xf0d79a],[0xf3ead6,0xc8463c]];
 function makeGift(s){
@@ -565,7 +668,7 @@ globe.add(botPts);
 
 // ---------- state ----------
 const counts=new Map();let totalGifts=0,mine=0,myGifts=[],myCountries={};
-let nick='산타 #'+(1000+Math.floor(Math.random()*9000));$('myname').textContent=nick;
+let nick='산타 #'+(1000+Math.floor(Math.random()*9000));$('myname').textContent=NK(nick);
 let santaN=1,online=false;
 function setBots(list){const n=Math.min(list.length,BOT_MAX);const cells=new Map();const keys=new Array(n);
   for(let i=0;i<n;i++){const [lon,lat]=list[list.length-n+i];const v=ll2v(lon,lat,R*1.0006);botPos.set([v.x,v.y,v.z],i*3);
@@ -576,20 +679,18 @@ function setBots(list){const n=Math.min(list.length,BOT_MAX);const cells=new Map
     const k=Math.min(1,Math.log2(c.n)/6);s.userData.b=.025+.06*k;s.userData.o=.18+.45*k;});
   botN=n;botGeo.setDrawRange(0,n);botGeo.attributes.position.needsUpdate=true;}
 function renderRank(){
-  const arr=[...counts.entries()].sort((a,b)=>b[1]-a[1]);const top=arr.slice(0,3);const ki=arr.findIndex(e=>e[0]==='대한민국');const kc=counts.get('대한민국')||0;
-  let body;
-  if(!top.length)body='<div class="kr" style="border:0;margin:0;padding:0">아직 아무도 선물을 보내지 않았어요.<br>첫 번째 산타가 되어 주세요 🎁</div>';
-  else{const kr=ki===0?'대한민국이 <b>1위</b>예요':ki>0?`대한민국 <b>${ki+1}위</b> · 1위까지 ${fmt(top[0][1]-kc)}개`:'대한민국은 아직 선물을 못 받았어요';
-    body=`<ol>${top.map((e,i)=>`<li><span>${i+1}. ${e[0]}</span><span class="c">${fmt(e[1])}</span></li>`).join('')}</ol><div class="kr">🇰🇷 ${kr}</div>`;}
-  const html=`<h4><span>선물을 많이 받은 나라</span><span>${online?'모두의 기록':'내 기록'}</span></h4>${body}`;
-  $('rankSide').innerHTML=html;$('rankBottom').innerHTML=html;
+  const arr=[...counts.entries()].sort((a,b)=>b[1]-a[1]);const top=arr.slice(0,3);const ki=arr.findIndex(e=>e[0]==='대한민국');const kc=counts.get('대한민국')||0;const en=LANG==='en';
+  const esc=s=>String(s).replace(/[<>&]/g,'');
   {const top10=arr.slice(0,10),mx=top10.length?top10[0][1]:1;
-   $('rankList').innerHTML=top10.length?top10.map((e,i)=>`<li class="${e[0]==='대한민국'?'kr':''}"><span class="n">${i+1}</span><span class="bar"><i style="width:${Math.max(6,e[1]/mx*100)}%"></i><span>${e[0].replace(/[<>&]/g,'')}</span></span><span class="c">${fmt(e[1])}</span></li>`).join(''):'<li style="display:block;color:var(--dim)">아직 아무도 선물을 보내지 않았어요. 첫 번째 산타가 되어 주세요 🎁</li>';
-   $('rankKr').innerHTML='🇰🇷 '+(ki<0?'대한민국은 아직 선물을 못 받았어요':`대한민국 <b style="color:var(--ink);font-weight:400">${ki+1}위</b> · ${fmt(kc)}개`);
-   $('rankSub').textContent=(online?'모든 산타의 기록':'내 기록')+' · 모두의 선물 '+fmt(totalGifts)+'개';}$('gifts').textContent=fmt(totalGifts);$('santas').textContent=fmt(santaN);$('santas2').textContent=fmt(santaN);$('mine').textContent=fmt(mine);}
+   $('rankList').innerHTML=top10.length?top10.map((e,i)=>`<li class="${e[0]==='대한민국'?'kr':''}"><span class="n">${i+1}</span><span class="bar"><i style="width:${Math.max(6,e[1]/mx*100)}%"></i><span>${esc(CN(e[0]))}</span></span><span class="c">${fmt(e[1])}</span></li>`).join('')
+     :`<li style="display:block;color:var(--dim)">${en?'No gifts yet. Be the first Santa 🎁':'아직 아무도 선물을 보내지 않았어요. 첫 번째 산타가 되어 주세요 🎁'}</li>`;
+   $('rankKr').innerHTML=en?`Your gifts: <b style="color:var(--ink);font-weight:400">${fmt(mine)}</b> · send more to push your country up 🚀`
+     :'🇰🇷 '+(ki<0?'대한민국은 아직 선물을 못 받았어요':`대한민국 <b style="color:var(--ink);font-weight:400">${ki+1}위</b> · ${fmt(kc)}개`);
+   $('rankSub').textContent=en?`Every Santa's gifts · ${fmt(totalGifts)} delivered`:(online?'모든 산타의 기록':'내 기록')+' · 모두의 선물 '+fmt(totalGifts)+'개';}
+  $('gifts').textContent=fmt(totalGifts);$('santas').textContent=fmt(santaN);$('santas2').textContent=fmt(santaN);$('mine').textContent=fmt(mine);}
 renderRank();
-let whT;function whisper(s){const w=$('whisper');w.textContent=s;w.classList.add('show');clearTimeout(whT);whT=setTimeout(()=>w.classList.remove('show'),2600);}
-let toastT;function toast(m,s){const t=$('toast');t.innerHTML=m+(s?`<small>${s}</small>`:'');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
+let whT;function whisper(s){s=TR(s);const w=$('whisper');w.textContent=s;w.classList.add('show');clearTimeout(whT);whT=setTimeout(()=>w.classList.remove('show'),2600);}
+let toastT;function toast(m,s){m=TR(m);s=s&&TR(s);const t=$('toast');t.innerHTML=m+(s?`<small>${s}</small>`:'');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
 function feed(h){const f=$('feed');const d=document.createElement('div');d.innerHTML=h;f.appendChild(d);while(f.children.length>3)f.firstChild.remove();setTimeout(()=>d.remove(),6000);}
 const SEA=[['고래가 받았어요 🐋','바다 깊이 천천히 가라앉는 중'],['물고기들이 받았어요 🐟','포장지는 해파리가 가져갔대요'],['문어가 받았어요 🐙','다리 여덟 개로 조심조심 여는 중'],
   ['거북이가 받았어요 🐢','다 열어보려면 백 년쯤 걸린대요'],['돌고래가 받았어요 🐬','신나서 세 번 뛰어올랐어요'],['인어가 받았어요 🧜','답장은 유리병에 넣어 보낸대요'],['등대지기가 건졌어요 🗼','오늘 밤은 외롭지 않겠네요']];
@@ -613,7 +714,7 @@ function dropAt(local,byMe=true,startOv=null,size=null,dur=1.1){
     setTimeout(()=>{
       if(lat>84){toast('산타 마을로 돌아왔어요 🎅','자기 집에 선물 주는 산타…');return;}
       if(c){renderRank();const sp=SPECIAL[c.n]||SPECIAL[c.e];
-        if(sp)toast(sp[0],sp[1]);else{const d=pick(DEST);toast(`${c.n}${d}`,`${nick}의 ${fmt(mine)}번째 선물`);}}
+        if(sp)toast(sp[0],sp[1]);else{const d=pick(DEST);if(LANG==='en')toast(`Delivered to ${CN(c.n)} 🎁`,`${NK(nick)} · gift #${fmt(mine)}`);else toast(`${c.n}${d}`,`${nick}의 ${fmt(mine)}번째 선물`);}}
       else{const s=pick(SEA);toast(s[0],s[1]);}},dur*1000*.85);
     renderRank();const h=$('hint');if(h)h.style.opacity=0;}
 }
@@ -644,7 +745,7 @@ let songIdx=Math.floor(Math.random()*SONGS.length);
 function mbox(f,t,d,v){tone(f,t,d,v);tone(f*2.0,t,.6,v*.18);tone(f*3.01,t,.25,v*.06);}
 function playSong(){if(!musicOn)return;const song=SONGS[songIdx%SONGS.length];songIdx++;
   const beat=60/song.bpm*1.12;let t=AC.currentTime+.3,b=0;
-  whisper('♪  '+song.t);
+  whisper('♪  '+TR(song.t));
   song.n.forEach(([n,d])=>{const m=nn(n)+12;const f=NF(m);const hum=rand(-.01,.01);mbox(f*(1+hum*.02),t+rand(0,.012),Math.min(3.2,d*beat*1.9),.1);
     if(Math.abs(b%song.bar)<.01){tone(NF(bassFor(m-12)),t,beat*song.bar*1.1,.055,'triangle');}
     t+=d*beat;b+=d;});
@@ -667,7 +768,7 @@ canvas.addEventListener('pointermove',e=>{if(mode!=='orbit'){rideMove(e);return;
 function up(e){if(mode!=='orbit'){rideUp(e);return;}const tap=dragging&&moved<8&&pointers.size===1;pointers.delete(e.pointerId);if(pointers.size<2)pinch0=null;if(pointers.size===0)dragging=false;
   if(tap){if(document.body.classList.contains('zen')){toggleZen(false);return;}const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
     const hit=ray.intersectObject(earth)[0];if(!hit){toggleZen(true);return;}if(hit){const l=globe.worldToLocal(hit.point.clone());const [lo,la]=v2ll(l);const c=countryAt(lo,la);
-      toast('여기는 '+(la>84?'북극 산타 마을':c?c.n:(la>66?'북극해':'바다')),'선물은 썰매를 타고 내려보낼 수 있어요 🛷');}}}
+      {const nm=la>84?'북극 산타 마을':c?c.n:(la>66?'북극해':'바다');toast(LANG==='en'?'This is '+CN(nm):'여기는 '+nm,'선물은 썰매를 타고 내려보낼 수 있어요 🛷');}if(0)toast(0,'선물은 썰매를 타고 내려보낼 수 있어요 🛷');}}}
 canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(mode!=='orbit')return;camDist=THREE.MathUtils.clamp(camDist*(1+e.deltaY*.001),1.7,6);},{passive:false});
 
@@ -682,8 +783,8 @@ function setLvl(l){RIDE.lvl=Math.max(0,Math.min(SPEEDS.length-1,l));$('spdLbl').
 function setAlt(a){RIDE.alt=Math.max(0,Math.min(ALTS.length-1,a));RIDE.h=ALTS[RIDE.alt].v;$('altLbl').textContent=ALTS[RIDE.alt].n;
   [...$('apips').children].forEach((e,i)=>e.classList.toggle('on',i<=RIDE.alt));}
 {const ap=$('apips');ALTS.forEach(()=>ap.appendChild(document.createElement('i')));}
-setAlt(3);$('lower').onclick=()=>{setAlt(RIDE.alt-1);whisper('높이 · '+ALTS[RIDE.alt].n);};$('higher').onclick=()=>{setAlt(RIDE.alt+1);whisper('높이 · '+ALTS[RIDE.alt].n);};
-setLvl(2);$('slower').onclick=()=>{setLvl(RIDE.lvl-1);whisper('속도 · '+SPEEDS[RIDE.lvl].n);};$('faster').onclick=()=>{setLvl(RIDE.lvl+1);whisper('속도 · '+SPEEDS[RIDE.lvl].n);};
+setAlt(3);$('lower').onclick=()=>{setAlt(RIDE.alt-1);whisper(TR('높이')+' · '+TR(ALTS[RIDE.alt].n));};$('higher').onclick=()=>{setAlt(RIDE.alt+1);whisper(TR('높이')+' · '+TR(ALTS[RIDE.alt].n));};
+setLvl(2);$('slower').onclick=()=>{setLvl(RIDE.lvl-1);whisper(TR('속도')+' · '+TR(SPEEDS[RIDE.lvl].n));};$('faster').onclick=()=>{setLvl(RIDE.lvl+1);whisper(TR('속도')+' · '+TR(SPEEDS[RIDE.lvl].n));};
 
 const FACE=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const tex=new THREE.CanvasTexture(c);tex.encoding=THREE.sRGBEncoding;return {c,g:c.getContext('2d'),tex,e:'',until:0,next:0};})();
 function drawFace(e){const g=FACE.g;g.clearRect(0,0,128,128);g.lineCap='round';g.lineJoin='round';
@@ -820,7 +921,7 @@ function rideCamPose(){
     const r=THREE.MathUtils.lerp(da.length(),db.length(),k)+Math.sin(k*Math.PI)*.02;pos=c.clone().add(da.normalize().lerp(db.normalize(),k).normalize().multiplyScalar(r));
     tgt=b.tgt.clone().lerp(a.tgt,k);}
   return {pos:globe.localToWorld(pos),tgt:globe.localToWorld(tgt),up:RIDE.p.clone().applyQuaternion(globe.quaternion).normalize()};}
-function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;whisper(VIEWS[view].replace('🎥 ',''));}
+function setView(v){viewPrev=view;view=v%VIEWS.length;viewT=0;whisper(TR(VIEWS[view]).replace('🎥 ',''));}
 function orbitCamPose(){const oy=innerWidth<innerHeight?.2*camDist/3.4:0;return {pos:new THREE.Vector3(0,oy,camDist),tgt:new THREE.Vector3(0,oy,0),up:new THREE.Vector3(0,1,0)};}
 
 function spawnVillage(slot){
@@ -847,7 +948,7 @@ function enterRide(fresh,slot){
 }
 let meMark=null;
 function placeMe(){if(!RIDE.saved)return;if(!meMark){meMark=new THREE.Group();const g1=glow(0xffd48a,.045,.95);const g2=glow(0xff5a4a,.016,1);meMark.add(g1,g2);
-  const lb=textSprite('🛷 내 썰매');lb.scale.set(.12,.03,1);lb.position.y=.035;meMark.add(lb);meMark.userData.g=g1;globe.add(meMark);}
+  const lb=textSprite(TR('🛷 내 썰매'));lb.scale.set(.12,.03,1);lb.position.y=.035;meMark.add(lb);meMark.userData.g=g1;globe.add(meMark);}
   meMark.position.copy(RIDE.saved.p.clone().multiplyScalar(R+.012));meMark.visible=true;}
 function exitRide(){if(mode!=='ride')return;RIDE.saved={p:RIDE.p.clone(),f:RIDE.f.clone()};RIDE.flying=true;document.body.classList.add('flying');setTimeout(placeMe,0);trans={from:{pos:camera.position.clone(),tgt:camTarget.clone(),up:camera.up.clone()},t:0,dur:2.4,to:'orbit'};
   mode='toOrbit';document.body.classList.remove('ride');}
@@ -932,7 +1033,7 @@ function rideStep(dt){
   trGeo.attributes.position.needsUpdate=true;trGeo.attributes.color.needsUpdate=true;
   miniT-=dt;if(miniT<=0&&(mode==='ride'||mode==='toRide')){miniT=.25;drawMini();}
   overT-=dt;if(overT<=0){overT=.35;const [lon,lat]=v2ll(RIDE.p);const c=countryAt(lon,lat);
-    $('over').textContent=(lat>84||RIDE.p.distanceTo(PLAZA.c)<.14)?'북극 산타 마을':c?c.n:(lat>66?'북극해':'바다');}
+    const lm=nearLandmark();if(lm&&lm!==lmWhisper){lmWhisper=lm;whisper(LANG==='en'?'✨ '+CN(lm).replace(/^the /,'The ')+' below':'✨ '+lm+'이(가) 보여요');}if(!lm)lmWhisper='';$('over').textContent=lm?CN(lm):CN((lat>84||RIDE.p.distanceTo(PLAZA.c)<.14)?'북극 산타 마을':c?c.n:(lat>66?'북극해':'바다'));}
 }
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function updateCamera(dt){
@@ -962,12 +1063,12 @@ const peers=new Map();
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 let myId=LS.get('santa.id');if(!myId){myId=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());LS.set('santa.id',myId);}
 function hashNick(id){let h=0;for(const ch of String(id))h=(h*31+ch.charCodeAt(0))>>>0;return '산타 #'+(1000+h%9000);}
-nick=hashNick(myId);$('myname').textContent=nick;mine=+(LS.get('santa.mine')||0);$('mine').textContent=fmt(mine);
+nick=hashNick(myId);$('myname').textContent=NK(nick);mine=+(LS.get('santa.mine')||0);$('mine').textContent=fmt(mine);
 function textSprite(txt){const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='28px "Gowun Dodum", sans-serif';g.textAlign='center';g.textBaseline='middle';
   g.fillStyle='rgba(8,13,30,.55)';const w=g.measureText(txt).width+28;g.beginPath();if(g.roundRect)g.roundRect(128-w/2,12,w,40,20);else g.rect(128-w/2,12,w,40);g.fill();g.fillStyle='#fbf3e4';g.fillText(txt,128,33);
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false}));s.scale.set(.1,.025,1);return s;}
 function peerObj(nk){const g=new THREE.Group();const model=sleigh.clone();model.visible=true;{const f=model.getObjectByName('face');if(f){const cc=document.createElement('canvas');cc.width=cc.height=128;cc.getContext('2d').drawImage(FACE.c,0,0);const save=FACE.e;drawFace('smile');cc.getContext('2d').clearRect(0,0,128,128);cc.getContext('2d').drawImage(FACE.c,0,0);drawFace(save||'smile');const tx=new THREE.CanvasTexture(cc);tx.encoding=THREE.sRGBEncoding;f.material=new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false});}const z=model.getObjectByName('zzz');if(z)z.parent.remove(z);}model.position.set(0,0,0);model.quaternion.identity();model.scale.set(1,1,1);const kill=[];model.traverse(o=>{if(o.isLight)kill.push(o);});kill.forEach(o=>o.parent.remove(o));
-  g.add(model);const far=glow(0xffc884,.03);g.add(far);const label=textSprite(nk);label.position.set(0,.011,0);g.add(label);globe.add(g);return {g,model,far,label};}
+  g.add(model);const far=glow(0xffc884,.03);g.add(far);const label=textSprite(NK(nk));label.position.set(0,.011,0);g.add(label);globe.add(g);return {g,model,far,label};}
 const sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false},realtime:{params:{eventsPerSecond:12}}}):null;
 let chan=null,chanReady=false,lastPos=0;
 const MP={
@@ -992,8 +1093,8 @@ function peerGift(g){if(!g||g.id===myId||!isFinite(g.lon)||!isFinite(g.lat))retu
   const local=ll2v(+g.lon,+g.lat).normalize();const start=P&&P.ride&&P.obj?P.obj.g.position.clone():null;
   dropAt(local,false,start,start?.003:.035,start?2.2:1.3);
   const k=String(g.k||'').slice(0,40);totalGifts++;if(k&&k!=='바다'&&k!=='산타 마을')counts.set(k,(counts.get(k)||0)+1);statPts.push([+g.lon,+g.lat]);setBots(statPts);renderRank();
-  const who=document.createElement('b');who.textContent=String(g.n||'산타').slice(0,16);
-  feed(`${who.outerHTML} 님이 ${k==='바다'||!k?'바다에':k.replace(/[<>&]/g,'')+'에'} 선물을 내려보냈어요`);}
+  const who=document.createElement('b');who.textContent=NK(String(g.n||'산타').slice(0,16));
+  if(LANG==='en')feed(`${who.outerHTML} dropped a gift on ${(k?CN(k):'the ocean').replace(/[<>&]/g,'')}`);else feed(`${who.outerHTML} 님이 ${k==='바다'||!k?'바다에':k.replace(/[<>&]/g,'')+'에'} 선물을 내려보냈어요`);}
 function updatePeers(dt){const now=performance.now();
   for(const [id,P] of peers){if(now-P.seen>8000&&!P.inRoom){if(P.obj)globe.remove(P.obj.g);peers.delete(id);continue;}
     if(!P.obj)continue;P.obj.g.visible=P.ride;if(!P.ride)continue;
@@ -1056,6 +1157,7 @@ function loop(){const dt=Math.min(clock.getDelta(),.05);meteorTick(dt);for(const
       if(k>=1){globe.remove(a.fl);a.fl.material.dispose();anims.splice(i,1);}}}
   if(meMark&&meMark.visible){const k=.75+.25*Math.sin(clock.elapsedTime*3);meMark.userData.g.scale.setScalar(.045*k);meMark.children[2].visible=closeK<.3;}
   {const kk=1-closeK*.85,tw=clock.elapsedTime;HOT.forEach((s,i)=>{if(!s.visible)return;s.scale.setScalar(s.userData.b*kk*(.9+.1*Math.sin(tw*1.3+i)));s.material.opacity=s.userData.o*(.8+.2*Math.sin(tw*.9+i*1.7));});}
+  for(const L of LANDMARKS)L.gl.scale.setScalar(.02*(1-closeK*.9));
   updatePeers(dt);if(mode==='ride')MP.pushPresence(false);
   renderer.render(scene,camera);requestAnimationFrame(loop);}
 loop();
@@ -1066,6 +1168,8 @@ function sres(){const d=devicePixelRatio;sc.width=innerWidth*d;sc.height=innerHe
 addEventListener('resize',sres);sres();
 (function snow(){sg.clearRect(0,0,sc.width,sc.height);for(const f of flakes){f.y+=f.v;f.w+=.008;f.x+=Math.sin(f.w)*.25;if(f.y>sc.height){f.y=-5;f.x=Math.random()*sc.width;}
   sg.fillStyle=`rgba(255,255,255,${f.a})`;sg.beginPath();sg.arc(f.x,f.y,f.r,0,6.28);sg.fill();}requestAnimationFrame(snow);})();
+i18nCollect();i18nApply();renderRank();
+$('langBtn').onclick=()=>{LANG=LANG==='en'?'ko':'en';try{localStorage.setItem('santa.lang',LANG)}catch(e){}i18nApply();renderRank();$('myname').textContent=NK(nick);};
 })();
 </script>
 </body>
