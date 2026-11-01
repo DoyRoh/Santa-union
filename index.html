@@ -145,7 +145,7 @@
   body.ride .badgeb{top:calc(max(16px,env(safe-area-inset-top)) + 200px)}
   body.ride .solarb,body.fresh .badgeb{display:none!important}
   .wave{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(max(18px,env(safe-area-inset-bottom)) + 140px);width:52px;height:52px;border-radius:50%;font-size:24px;padding:0;z-index:4;animation:pulse 1.5s infinite}
-  .wishb{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(16px,env(safe-area-inset-top)) + 130px);z-index:5;font-size:14px;padding:9px 18px;animation:pulse 1.2s infinite}
+  .wishb{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(16px,env(safe-area-inset-top)) + 190px);z-index:5;font-size:14px;padding:9px 18px;animation:pulse 1.2s infinite}
   .wave[hidden],.wishb[hidden]{display:none!important}
   body.zen .zhide{opacity:0!important;pointer-events:none!important}
   #solarHud{position:fixed;left:0;right:0;top:max(16px,env(safe-area-inset-top));display:none;flex-direction:column;align-items:center;gap:6px;z-index:6;pointer-events:none}
@@ -154,6 +154,8 @@
   #solarHud .sd{font-size:12px;color:var(--dim)}
   body.solar #solarHud{display:flex}
   #walkHud{display:none}
+  body.walk #whisper{top:calc(max(16px,env(safe-area-inset-top)) + 112px)}
+  body.walk #toast{top:36%}
   body.walk #walkHud{display:block}
   body.walk .hud,body.walk .corner:not(.music),body.walk #mini,body.walk .feed,body.walk .zhide,body.walk #placeBar{display:none!important}
   #walkHud .wtop{position:fixed;left:0;right:0;top:max(16px,env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:6px;z-index:6}
@@ -192,7 +194,7 @@
   .tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);font:inherit;font-size:13px;padding:8px;border-radius:999px;cursor:pointer}
   .tabs button.on{color:var(--ink);border-color:rgba(243,199,112,.45);background:rgba(243,199,112,.1)}
   .linkb{background:none;border:0;color:var(--gold);font:inherit;font-size:12px;padding:8px 0 0;cursor:pointer;text-decoration:underline}
-  .placebar{position:fixed;left:0;right:0;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 150px);display:none;justify-content:center;gap:8px;flex-wrap:wrap;z-index:4;padding:0 12px;pointer-events:none}
+  .placebar{position:fixed;left:0;right:0;top:calc(max(16px,env(safe-area-inset-top)) + 64px);display:none;justify-content:center;gap:8px;flex-wrap:wrap;z-index:4;padding:0 12px;pointer-events:none}
   .placebar.on{display:flex}
   .placebar .pt{width:100%;text-align:center;font-size:12px;color:var(--dim);text-shadow:0 1px 8px #000}
   .placebar button{pointer-events:auto;border:1px solid rgba(243,199,112,.35);background:rgba(10,14,30,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);font:inherit;font-size:13px;padding:8px 13px;border-radius:999px;cursor:pointer}
@@ -413,7 +415,7 @@ const D={
 '대한민국에 도착했어요 🇰🇷':'Delivered to South Korea 🇰🇷','어느 집 굴뚝으로 쏙 들어갔어요':'Straight down a chimney','펭귄이 받았어요 🐧':'A penguin got it 🐧','남극에도 크리스마스는 와요':'Christmas comes to Antarctica too',
 '그린란드에 도착 ❄️':'Delivered to Greenland ❄️','산타 마을 이웃이라 배송비 무료':"Free shipping — Santa's neighbors",'핀란드에 도착 🦌':'Delivered to Finland 🦌','순록들이 반갑게 맞아줬어요':'The reindeer said hi',
 '일본에 도착했어요':'Delivered to Japan','이웃 나라에도 따뜻한 밤':'A warm night for the neighbors','러시아에 도착했어요':'Delivered to Russia','너무 넓어서 아직 배달 중이에요':'So big it is still being delivered',
-'산타 #':'Santa #','시점 바꾸기':'Change view','썰매 타기':'Back to the sleigh','왼쪽 아래 동그라미를 밀어서 걸어요':'Push the circle at the bottom left to walk','배지와 공유':'Badges & share','태양계 보기':'Solar system','지구로 돌아가기':'Back to Earth','태양계':'Solar System','나의 산타 배지':'My Santa badges',
+'산타 #':'Santa #','썰매에서 내려 마을 걷기':'Hop off and walk the village','시점 바꾸기':'Change view','썰매 타기':'Back to the sleigh','왼쪽 아래 동그라미를 밀어서 걸어요':'Push the circle at the bottom left to walk','배지와 공유':'Badges & share','태양계 보기':'Solar system','지구로 돌아가기':'Back to Earth','태양계':'Solar System','나의 산타 배지':'My Santa badges',
 '공유 카드 만들기':'Make a share card','친구랑 같이 날기 링크':'Fly-with-me link','어느 나라 산타인가요?':'Which country do you fly for?','내가 보내는 선물은 모두 이 나라 점수가 돼요':'Every gift you send scores for this country',
 '나라 검색':'Search countries','별똥별에 소원을 빌어요':'Make a wish on the shooting star','소원을 적어주세요':'Write your wish','취소':'Cancel','빌기':'Wish','이미지를 길게 눌러 저장할 수도 있어요':'You can also long-press the image to save it',
 '공유하기':'Share','저장':'Save','산타 국가 대항전':'Santa country battle','선물 받은 나라':'Gifts received','내 나라 바꾸기':'Change my country','소원 빌기':'Make a wish','북극해':'the Arctic Ocean','바다':'the ocean','산타 마을':"Santa's Village",
@@ -1577,7 +1579,7 @@ function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;let jx=0,jy=0;
   if(mag>.12){const cy=WALK.camYaw+(WALK.view===1?Math.PI:0);const fx=Math.sin(cy),fz=Math.cos(cy);const wx=fx*jy-fz*jx,wz=fz*jy+fx*jx;const want=Math.atan2(wx,wz);
     me.rotation.y+=((want-me.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*10);sp=mag*3.4;me.position.x+=Math.sin(me.rotation.y)*sp*dt;me.position.z+=Math.cos(me.rotation.y)*sp*dt;
     if(WALK.view!==1)WALK.camYaw+=((me.rotation.y-WALK.camYaw+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*1.6);}
-  if(WALK.room==='village')villageZones();
+  if(WALK.room==='village')villageZones();ctxTick(dt);
   const B=WALK.bounds;if(WALK.room==='wrap'){me.position.x=THREE.MathUtils.clamp(me.position.x,-B,B);me.position.z=THREE.MathUtils.clamp(me.position.z,-B,B);}else{const r=Math.hypot(me.position.x,me.position.z);if(r>B)me.position.multiplyScalar(B/r);}
   let y=0;if(WALK.room==='spa'){const r=Math.hypot(me.position.x,me.position.z);const inW=r<4.1;y=inW?-.95:0;if(inW&&!WALK.inWater){WALK.inWater=true;whisper(L('풍덩, 따끈해요','Splash, nice and warm'));unlock('spa');}if(!inW)WALK.inWater=false;}
   me.position.y+=(y-me.position.y)*Math.min(1,dt*6);animWalker(me,Math.abs(sp),dt);
@@ -1590,7 +1592,7 @@ function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;let jx=0,jy=0;
   if(WALK.ring){WALK.ring.material.opacity=.35+.3*Math.sin(WALK.t*3);}
   if(WALK.aurora){WALK.aurora.material.opacity=.7+.3*Math.sin(WALK.t*.7);WALK.aurora.position.x=Math.sin(WALK.t*.1)*6;}
   for(const D of WALK.deer){D.wait-=dt;const p=D.g.position;const to=D.tgt.clone().sub(p);to.y=0;let mv=0;
-    if(D.wait<=0){if(to.length()<.3){D.wait=rand(2,6);D.tgt.set(rand(-7.5,7.5),0,rand(-7.5,7.5));}else{const a=Math.atan2(to.x,to.z);D.g.rotation.y+=((a-D.g.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);p.addScaledVector(to.normalize(),1.1*dt);mv=1;}}
+    if(D.wait<=0){if(to.length()<.3){D.wait=rand(3,7);D.tgt.set(rand(-7.5,7.5),0,rand(-7.5,7.5));}else{const a=Math.atan2(to.x,to.z);D.g.rotation.y+=((a-D.g.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);p.addScaledVector(to.normalize(),1.1*dt);mv=1;}}
     D.ph+=dt*(mv?7:1.5);D.legs.forEach((l,i)=>{l.rotation.x=Math.sin(D.ph+(i%2?0:Math.PI))*.4*mv;});}
   for(const P of WALK.poops)P.rotation.y+=dt;
   {const yw=WALK.view===1?me.rotation.y+Math.PI:WALK.camYaw,dist=WALK.view===1?3.2:WALK.view===2?11:5.2,h=WALK.view===1?1.7:WALK.view===2?8:3.1;
@@ -1605,14 +1607,18 @@ function walkPtr(e,ph){if(ph===0){WALK.joy={x0:e.clientX,y0:e.clientY,dx:0,dy:0,
     const hd=WALK.deer.find(D=>ray.intersectObject(D.g,true).length);if(hd)return feedNear(hd);}}
 addEventListener('keydown',e=>{if(mode==='walk'){WALK.keys[e.key]=1;if(e.code==='Space'){e.preventDefault();walkAct(WALK.room==='wrap'?'wrap':WALK.room==='farm'?'feed':'splash');}}});
 addEventListener('keyup',e=>{WALK.keys[e.key]=0;});
-function cleanPoop(p){const i=WALK.poops.indexOf(p);if(i<0)return;if(p.position.distanceTo(WALK.me.position)>3){whisper(L('조금 더 가까이 가요','Get a little closer'));return;}WALK.scene.remove(p);WALK.poops.splice(i,1);sendRoom('clean');farmPts();}
-function nearDeer(){let b=null,bd=3;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}return b;}
-function feedNear(D){D=D||nearDeer();if(!D||D.g.position.distanceTo(WALK.me.position)>3.2){whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));return;}
+function cleanPoop(p){const i=WALK.poops.indexOf(p);if(i<0)return;if(p.position.distanceTo(WALK.me.position)>3.4){whisper(L('조금 더 가까이 가요','Get a little closer'));return;}WALK.scene.remove(p);WALK.poops.splice(i,1);sendRoom('clean');farmPts();}
+function nearDeer(lim){let b=null,bd=lim||3.4;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}return b;}
+function feedNear(D){D=D||nearDeer();if(!D||D.g.position.distanceTo(WALK.me.position)>3.6){whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));return;}
   const h=glow(0xff7aa8,.8,1);h.position.copy(D.g.position).add(new THREE.Vector3(0,2.8,0));WALK.scene.add(h);const t0=performance.now();(function f(){const k=(performance.now()-t0)/1000;h.position.y+=.02;h.material.opacity=1-k;if(k<1)requestAnimationFrame(f);else WALK.scene.remove(h);})();
-  whisper(L(D.nm[0]+'가 냠냠 먹어요',D.nm[1]+' munches happily'));sendRoom('feed');farmPts();D.wait=2;}
+  whisper(L(D.nm[0]+'가 냠냠 먹어요',D.nm[1]+' munches happily'));sendRoom('feed');farmPts();D.wait=4;D.tgt.copy(D.g.position);faceTo(D);}
+function faceTo(D){const v=WALK.me.position.clone().sub(D.g.position);D.g.rotation.y=Math.atan2(v.x,v.z);}
 function walkAct(a){if(a==='wrap'){const done=wrapNext();if(done){wrapCount++;sendRoom('wrap');whisper(L(`포장 완료 · 지금까지 ${wrapCount}개`,`Wrapped · ${wrapCount} so far`));if(wrapCount>=3)unlock('elf');}return;}
   if(a==='feed')return feedNear();if(a==='cleanall'){let b=null,bd=3;for(const p of WALK.poops){const d=p.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=p;}}if(b)cleanPoop(b);else whisper(L('근처에 치울 똥이 없어요','No poop nearby'));return;}
-  if(a==='pet'){const D=nearDeer();if(!D)return whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));sendRoom('pet');farmPts();return;}
+  if(a==='pet'){const D=nearDeer();if(!D)return whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));sendRoom('pet');farmPts();D.wait=4;D.tgt.copy(D.g.position);faceTo(D);
+    const h=glow(0xff9ac8,.7,1);h.position.copy(D.g.position).add(new THREE.Vector3(0,2.6,0));WALK.scene.add(h);setTimeout(()=>WALK.scene.remove(h),900);whisper(L(D.nm[0]+'가 좋아해요',D.nm[1]+' loves it'));return;}
+  if(a==='call'){let b=null,bd=1e9;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}if(!b)return;
+    const dir=new THREE.Vector3(Math.sin(WALK.me.rotation.y),0,Math.cos(WALK.me.rotation.y));b.tgt.copy(WALK.me.position).addScaledVector(dir,1.8);b.tgt.y=0;b.wait=0;whisper(L(b.nm[0]+'가 달려와요',b.nm[1]+' is coming'));return;}
   sendRoom(a);}
 // overrides of the old popup rooms
 function enterRoom(k){if((roomCounts[k]||0)>=ROOM_MAX){toast(L('만원이에요','It\'s full'),L(`정원 ${ROOM_MAX}명이 모두 차 있어요. 조금 뒤에 다시 와요`,`All ${ROOM_MAX} spots are taken. Try again soon`));return;}
@@ -1699,7 +1705,17 @@ function villageZones(){if(zoneCool>performance.now())return;const p=WALK.me.pos
 function goRoom(k){if((roomCounts[k]||0)>=ROOM_MAX){toast(L('만원이에요','It\'s full'),L(`정원 ${ROOM_MAX}명이 모두 차 있어요`,`All ${ROOM_MAX} spots are taken`));return;}
   const f=$('fade');f.classList.add('on');setTimeout(()=>{curRoom=k;WALK.room=k;setRoomPresence();buildWalk(k);walkUI();drawAvatars();f.classList.remove('on');
     setTimeout(()=>toast(L(ROOMS[k][0],ROOMS[k][1]),k==='spa'?L('가운데 온천으로 걸어 들어가 보세요','Walk into the spring in the middle'):k==='wrap'?L('가운데 포장대에서 포장을 도와요','Help at the table in the middle'):L('순록을 눌러 당근을 주고 똥을 치워요','Tap reindeer to feed them, tap poop to clean')),400);},600);}
-function walkUI(){const k=WALK.room;$('walkTitle').textContent=k==='village'?L('북극 산타 마을','Santa\'s Village'):L(ROOMS[k][0],ROOMS[k][1]);
+var ctxT=0,ctxKey='';
+function ctxActs(){const k=WALK.room,me=WALK.me;if(!me)return [[],''];
+  if(k==='farm'){const D=nearDeer(3.4);let pp=null;for(const p of WALK.poops)if(p.position.distanceTo(me.position)<3)pp=p;
+    const a=[['call','순록 부르기','Call a reindeer']];if(D)a.unshift(['feed',`${L(D.nm[0],D.nm[1])}에게 당근 주기`,`Feed ${D.nm[1]}`],['pet','쓰다듬기','Pet']);if(pp)a.unshift(['cleanall','똥 치우기','Clean up']);
+    return [a,D||pp?'':L('순록이나 똥 가까이 걸어가면 버튼이 생겨요','Walk up to a reindeer or poop to interact')];}
+  if(k==='wrap'){const near=me.position.distanceTo(new THREE.Vector3(0,0,-1))<2.8;return [near?[['wrap','포장 돕기','Help wrap'],['cheer','엘프 응원','Cheer elves']]:[['cheer','엘프 응원','Cheer elves']],near?'':L('가운데 빛나는 원으로 걸어가요','Walk to the glowing circle in the middle')];}
+  if(k==='spa')return [[['splash','첨벙','Splash'],['sing','노래','Sing'],['towel','수건 올리기','Towel'],['ahh','아~ 좋다','Ahh']],WALK.inWater?'':L('가운데 온천으로 걸어 들어가요','Walk into the spring')];
+  return [[['hi','인사하기','Say hi']],L('빛나는 원으로 걸어가면 들어갈 수 있어요','Walk into a glowing circle to go inside')];}
+function ctxTick(dt){ctxT-=dt;if(ctxT>0)return;ctxT=.25;const [a,h]=ctxActs();const key=JSON.stringify(a)+h+LANG;if(key===ctxKey)return;ctxKey=key;
+  $('walkActs').innerHTML=a.map(([x,ko,en])=>`<button data-a="${x}">${L(ko,en)}</button>`).join('');const wh=$('walkHint');wh.textContent=h;wh.style.opacity=h?1:0;}
+function walkUI(){ctxKey='';const k=WALK.room;$('walkTitle').textContent=k==='village'?L('북극 산타 마을','Santa\'s Village'):L(ROOMS[k][0],ROOMS[k][1]);
   $('walkExit').textContent=k==='village'?L('썰매 타기','Back to the sleigh'):L('마을로 나가기','Back to the village');
   const acts=k==='village'?[['hi','인사하기','Say hi']]:k==='spa'?[['splash','첨벙','Splash'],['sing','노래','Sing'],['towel','수건 올리기','Towel'],['ahh','아~ 좋다','Ahh']]:k==='wrap'?[['wrap','포장 돕기','Help wrap'],['cheer','엘프 응원','Cheer elves']]:[['feed','당근 주기','Feed'],['pet','쓰다듬기','Pet'],['cleanall','똥 치우기','Clean up']];
   $('walkActs').innerHTML=acts.map(([a,ko,en])=>`<button data-a="${a}">${L(ko,en)}</button>`).join('');}
