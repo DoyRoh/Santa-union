@@ -1592,7 +1592,8 @@ function walkTick(dt){const me=WALK.me;if(!me)return;WALK.t+=dt;let jx=0,jy=0;
   if(WALK.ring){WALK.ring.material.opacity=.35+.3*Math.sin(WALK.t*3);}
   if(WALK.aurora){WALK.aurora.material.opacity=.7+.3*Math.sin(WALK.t*.7);WALK.aurora.position.x=Math.sin(WALK.t*.1)*6;}
   for(const D of WALK.deer){D.wait-=dt;const p=D.g.position;const to=D.tgt.clone().sub(p);to.y=0;let mv=0;
-    if(D.wait<=0){if(to.length()<.3){D.wait=rand(3,7);D.tgt.set(rand(-7.5,7.5),0,rand(-7.5,7.5));}else{const a=Math.atan2(to.x,to.z);D.g.rotation.y+=((a-D.g.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);p.addScaledVector(to.normalize(),1.1*dt);mv=1;}}
+    if(D.wait<=0){if(to.length()<.3&&D.pending){const a=D.pending;D.pending=null;eatAnim(D,a,true);}else if(to.length()<.3){D.wait=rand(3,7);D.tgt.set(rand(-7.5,7.5),0,rand(-7.5,7.5));}else{const a=Math.atan2(to.x,to.z);D.g.rotation.y+=((a-D.g.rotation.y+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);p.addScaledVector(to.normalize(),1.1*dt);mv=1;}}
+    if(D.munch>0){D.munch-=dt;D.d.rotation.x=Math.abs(Math.sin(WALK.t*9))*.18;}else D.d.rotation.x*=.9;
     D.ph+=dt*(mv?7:1.5);D.legs.forEach((l,i)=>{l.rotation.x=Math.sin(D.ph+(i%2?0:Math.PI))*.4*mv;});}
   for(const P of WALK.poops)P.rotation.y+=dt;
   {const yw=WALK.view===1?me.rotation.y+Math.PI:WALK.camYaw,dist=WALK.view===1?3.2:WALK.view===2?11:5.2,h=WALK.view===1?1.7:WALK.view===2?8:3.1;
@@ -1609,14 +1610,25 @@ addEventListener('keydown',e=>{if(mode==='walk'){WALK.keys[e.key]=1;if(e.code===
 addEventListener('keyup',e=>{WALK.keys[e.key]=0;});
 function cleanPoop(p){const i=WALK.poops.indexOf(p);if(i<0)return;if(p.position.distanceTo(WALK.me.position)>3.4){whisper(L('조금 더 가까이 가요','Get a little closer'));return;}WALK.scene.remove(p);WALK.poops.splice(i,1);sendRoom('clean');farmPts();}
 function nearDeer(lim){let b=null,bd=lim||3.4;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}return b;}
-function feedNear(D){D=D||nearDeer();if(!D||D.g.position.distanceTo(WALK.me.position)>3.6){whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));return;}
-  const h=glow(0xff7aa8,.8,1);h.position.copy(D.g.position).add(new THREE.Vector3(0,2.8,0));WALK.scene.add(h);const t0=performance.now();(function f(){const k=(performance.now()-t0)/1000;h.position.y+=.02;h.material.opacity=1-k;if(k<1)requestAnimationFrame(f);else WALK.scene.remove(h);})();
-  whisper(L(D.nm[0]+'가 냠냠 먹어요',D.nm[1]+' munches happily'));sendRoom('feed');farmPts();D.wait=4;D.tgt.copy(D.g.position);faceTo(D);}
+function closestDeer(){let b=null,bd=1e9;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}return [b,bd];}
+function feedNear(D,act){act=act||'feed';let bd;if(!D)[D,bd]=closestDeer();else bd=D.g.position.distanceTo(WALK.me.position);if(!D)return;
+  if(bd>2.6){const dir=new THREE.Vector3(Math.sin(WALK.me.rotation.y),0,Math.cos(WALK.me.rotation.y));D.tgt.copy(WALK.me.position).addScaledVector(dir,1.9);D.tgt.y=0;D.wait=0;D.pending=act;
+    whisper(L(D.nm[0]+'가 달려와요',D.nm[1]+' is coming'));return;}
+  eatAnim(D,act,true);}
+function eatAnim(D,act,mine){faceTo(D);D.wait=4;D.tgt.copy(D.g.position);D.munch=act==='feed'?2:1.2;
+  const head=D.g.position.clone().add(new THREE.Vector3(Math.sin(D.g.rotation.y)*1.1,1.45,Math.cos(D.g.rotation.y)*1.1));
+  if(act==='feed'){const c=new THREE.Group();const cr=new THREE.Mesh(new THREE.ConeGeometry(.09,.5,10),STD(0xf08a24,{roughness:.6}));cr.rotation.x=Math.PI/2;c.add(cr);
+    const lf=new THREE.Mesh(new THREE.ConeGeometry(.07,.2,6),STD(0x3a9a4a));lf.rotation.x=-Math.PI/2;lf.position.z=-.32;c.add(lf);WALK.scene.add(c);
+    const src=(mine?WALK.me:D.g).position.clone().add(new THREE.Vector3(0,1.2,0));const t0=performance.now();
+    (function fl(){const k=Math.min(1,(performance.now()-t0)/600);c.position.lerpVectors(src,head,k);c.position.y+=Math.sin(k*Math.PI)*.6;c.lookAt(head);
+      if(k<1)requestAnimationFrame(fl);else{let s=1;(function sh(){s-=.03;c.scale.setScalar(Math.max(0,s));if(s>0)requestAnimationFrame(sh);else WALK.scene.remove(c);})();}})();}
+  setTimeout(()=>{for(let i=0;i<3;i++){const h=glow(0xff7aa8,.55,1);h.position.copy(head).add(new THREE.Vector3(rand(-.3,.3),.4+i*.25,rand(-.3,.3)));WALK.scene.add(h);const t1=performance.now()+i*150;
+    (function f(){const k=(performance.now()-t1)/1100;if(k<0)return requestAnimationFrame(f);h.position.y+=.012;h.material.opacity=Math.max(0,1-k);if(k<1)requestAnimationFrame(f);else WALK.scene.remove(h);})();}},act==='feed'?600:0);
+  if(mine){whisper(act==='feed'?L(D.nm[0]+'가 당근을 냠냠 먹어요',D.nm[1]+' munches the carrot'):L(D.nm[0]+'가 좋아해요',D.nm[1]+' loves it'));sendRoom(act,WALK.deer.indexOf(D));farmPts();}}
 function faceTo(D){const v=WALK.me.position.clone().sub(D.g.position);D.g.rotation.y=Math.atan2(v.x,v.z);}
 function walkAct(a){if(a==='wrap'){const done=wrapNext();if(done){wrapCount++;sendRoom('wrap');whisper(L(`포장 완료 · 지금까지 ${wrapCount}개`,`Wrapped · ${wrapCount} so far`));if(wrapCount>=3)unlock('elf');}return;}
   if(a==='feed')return feedNear();if(a==='cleanall'){let b=null,bd=3;for(const p of WALK.poops){const d=p.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=p;}}if(b)cleanPoop(b);else whisper(L('근처에 치울 똥이 없어요','No poop nearby'));return;}
-  if(a==='pet'){const D=nearDeer();if(!D)return whisper(L('순록에게 가까이 가요','Walk up to a reindeer'));sendRoom('pet');farmPts();D.wait=4;D.tgt.copy(D.g.position);faceTo(D);
-    const h=glow(0xff9ac8,.7,1);h.position.copy(D.g.position).add(new THREE.Vector3(0,2.6,0));WALK.scene.add(h);setTimeout(()=>WALK.scene.remove(h),900);whisper(L(D.nm[0]+'가 좋아해요',D.nm[1]+' loves it'));return;}
+  if(a==='pet'){feedNear(null,'pet');return;}
   if(a==='call'){let b=null,bd=1e9;for(const D of WALK.deer){const d=D.g.position.distanceTo(WALK.me.position);if(d<bd){bd=d;b=D;}}if(!b)return;
     const dir=new THREE.Vector3(Math.sin(WALK.me.rotation.y),0,Math.cos(WALK.me.rotation.y));b.tgt.copy(WALK.me.position).addScaledVector(dir,1.8);b.tgt.y=0;b.wait=0;whisper(L(b.nm[0]+'가 달려와요',b.nm[1]+' is coming'));return;}
   sendRoom(a);}
@@ -1638,7 +1650,9 @@ function drawAvatars(){if(!curRoom||!WALK.scene)return;const list=(roomMembers[c
 function walkPos(p){if(!p||p.room!==curRoom||p.id===myId||!WALK.scene)return;let o=WALK.others.get(p.id);if(!o){const g=makeWalker(NK(String(p.n||'산타').slice(0,12)),false);g.position.set(+p.x,0,+p.z);WALK.scene.add(g);o={g,to:g.position.clone(),r:+p.r};WALK.others.set(p.id,o);}
   o.to.set(+p.x||0,0,+p.z||0);o.r=+p.r||0;}
 function bubble(id,txt){const w=id===myId?WALK.me:(WALK.others.get(id)||{}).g;if(!w||!WALK.scene)return;const sp=textSprite(txt);sp.scale.set(.13,.0325,1);sp.position.y=2.95;w.add(sp);setTimeout(()=>w.remove(sp),2400);}
-function roomEvent(p){if(!p||p.room!==curRoom||p.id===myId||!EMO[p.a])return;bubble(p.id,L(EMO[p.a],EMO_EN[p.a]));if(p.a==='wrap')wrapCount++;}
+function roomEvent(p){if(!p||p.room!==curRoom||p.id===myId||!EMO[p.a])return;bubble(p.id,L(EMO[p.a],EMO_EN[p.a]));if(p.a==='wrap')wrapCount++;
+  if((p.a==='feed'||p.a==='pet')&&WALK.deer[p.x|0])eatAnim(WALK.deer[p.x|0],p.a,false);
+  if(p.a==='clean'&&WALK.poops.length){const q=WALK.poops.pop();WALK.scene.remove(q);}}
 function farmPts(){farmScore++;if(farmScore>=5)unlock('farm');}
 
 // ================= JOYSTICK =================
@@ -1708,8 +1722,8 @@ function goRoom(k){if((roomCounts[k]||0)>=ROOM_MAX){toast(L('만원이에요','I
 var ctxT=0,ctxKey='';
 function ctxActs(){const k=WALK.room,me=WALK.me;if(!me)return [[],''];
   if(k==='farm'){const D=nearDeer(3.4);let pp=null;for(const p of WALK.poops)if(p.position.distanceTo(me.position)<3)pp=p;
-    const a=[['call','순록 부르기','Call a reindeer']];if(D)a.unshift(['feed',`${L(D.nm[0],D.nm[1])}에게 당근 주기`,`Feed ${D.nm[1]}`],['pet','쓰다듬기','Pet']);if(pp)a.unshift(['cleanall','똥 치우기','Clean up']);
-    return [a,D||pp?'':L('노란 원이 있는 순록 옆으로 걸어가면 초록색으로 바뀌며 당근을 줄 수 있어요','Walk to the reindeer with the yellow ring — it turns green when you can feed it')];}
+    const a=[['feed','당근 주기','Feed a carrot'],['pet','쓰다듬기','Pet']];if(pp)a.push(['cleanall','똥 치우기','Clean up']);
+    return [a,'',''];}
   if(k==='wrap'){const near=me.position.distanceTo(new THREE.Vector3(0,0,-1))<2.8;return [near?[['wrap','포장 돕기','Help wrap'],['cheer','엘프 응원','Cheer elves']]:[['cheer','엘프 응원','Cheer elves']],near?'':L('가운데 빛나는 원으로 걸어가요','Walk to the glowing circle in the middle')];}
   if(k==='spa')return [[['splash','첨벙','Splash'],['sing','노래','Sing'],['towel','수건 올리기','Towel'],['ahh','아~ 좋다','Ahh']],WALK.inWater?'':L('가운데 온천으로 걸어 들어가요','Walk into the spring')];
   return [[['hi','인사하기','Say hi']],L('빛나는 원으로 걸어가면 들어갈 수 있어요','Walk into a glowing circle to go inside')];}
